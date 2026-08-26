@@ -33,9 +33,6 @@ yarn-error.log*
 /prisma/dev.db
 /runtime-uploads
 
-# seeded PDF content (~1.6GB) — too large for git, handled separately for deploys
-/public/uploads
-
 # vercel
 .vercel
 
