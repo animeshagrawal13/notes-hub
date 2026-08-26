@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum support, so these fields are plain strings.
+// Role: STUDENT | ADMIN
+// ResourceType: NOTES | HANDWRITTEN_NOTES | PYQ | QUESTION_BANK | ASSIGNMENT | PRACTICAL
+//               | LAB_MANUAL | REFERENCE_MATERIAL | IMPORTANT_QUESTIONS | CHEAT_SHEET | SYLLABUS | SLIDES
+// ResourceStatus: PENDING | APPROVED | REJECTED
+// ReportStatus: OPEN | RESOLVED
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STUDENT")
+  collegeId    String?
+  branchId     String?
+  semesterId   String?
+  createdAt    DateTime @default(now())
+
+  college   College?  @relation(fields: [collegeId], references: [id])
+  branch    Branch?   @relation(fields: [branchId], references: [id])
+  semester  Semester? @relation(fields: [semesterId], references: [id])
+
+  resources Resource[]
+  bookmarks Bookmark[]
+  ratings   Rating[]
+  reports   Report[]
+}
+
+model College {
+  id   String @id @default(cuid())
+  name String
+  slug String @unique
+  city String
+
+  branches  Branch[]
+  semesters Semester[]
+  users     User[]
+}
+
+// Branch only applies from Year 2 onward. First-year curriculum is common
+// to every branch, so first-year Semesters attach directly to the College
+// with branchId = NULL instead of going through a Branch.
+model Branch {
+  id        String  @id @default(cuid())
+  name      String
+  slug      String
+  collegeId String
+  college   College @relation(fields: [collegeId], references: [id])
+
+  semesters Semester[]
+  users     User[]
+
+  @@unique([collegeId, slug])
+}
+
+model Semester {
+  id        String  @id @default(cuid())
+  collegeId String
+  college   College @relation(fields: [collegeId], references: [id])
+  branchId  String?
+  branch    Branch? @relation(fields: [branchId], references: [id])
+
+  year   Int // 1 = First Year, 2 = Second Year, 3 = Third Year, 4 = Fourth Year
+  number Int // 1 or 2 — the semester within that year
+
+  subjects Subject[]
+  users    User[]
+
+  @@index([collegeId, year, number])
+}
+
+model Subject {
+  id         String   @id @default(cuid())
+  name       String
+  code       String
+  credits    String? // e.g. "L2·T1·P0 | 3 Credits", straight from the official syllabus
+  semesterId String
+  semester   Semester @relation(fields: [semesterId], references: [id])
+
+  units     Unit[]
+  resources Resource[]
+
+  @@unique([semesterId, code])
+}
+
+model Unit {
+  id        String  @id @default(cuid())
+  number    Int
+  title     String
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  topics    Topic[]
+  resources Resource[]
+
+  @@unique([subjectId, number])
+}
+
+// Optional topic level within a unit. Not every unit needs topics — when a
+// subject's syllabus doesn't break down cleanly, resources can attach
+// directly to the Unit instead (topicId left null).
+model Topic {
+  id     String @id @default(cuid())
+  name   String
+  unitId String
+  unit   Unit   @relation(fields: [unitId], references: [id])
+
+  resources Resource[]
+
+  @@unique([unitId, name])
+}
+
+model Resource {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  fileUrl     String
+  fileType    String
+  fileSize    Int
+  tags        String
+  type        String
+  status      String @default("PENDING")
+  views       Int    @default(0)
+  downloads   Int    @default(0)
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  unitId    String?
+  unit      Unit?   @relation(fields: [unitId], references: [id])
+  topicId   String?
+  topic     Topic?  @relation(fields: [topicId], references: [id])
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  bookmarks Bookmark[]
+  ratings   Rating[]
+  reports   Report[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId])
+  @@index([status])
+}
+
+model Bookmark {
+  id         String   @id @default(cuid())
+  userId     String
+  resourceId String
+  collection String   @default("Saved")
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
+
+  @@unique([userId, resourceId])
+}
+
+model Rating {
+  id         String   @id @default(cuid())
+  userId     String
+  resourceId String
+  stars      Int
+  review     String?
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  resource Resource @relation(fields: [resourceId], references: [id])
+
+  @@unique([userId, resourceId])
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  resourceId String
+  userId     String
+  reason     String
+  details    String?
+  status     String   @default("OPEN")
+  createdAt  DateTime @default(now())
+
+  resource Resource @relation(fields: [resourceId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+}

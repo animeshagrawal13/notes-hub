@@ -26,7 +26,15 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
+
+# local dev database and runtime uploads (production uses a mounted volume)
+/prisma/dev.db
+/runtime-uploads
+
+# seeded PDF content (~1.6GB) — too large for git, handled separately for deploys
+/public/uploads
 
 # vercel
 .vercel
