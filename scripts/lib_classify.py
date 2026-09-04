@@ -211,6 +211,13 @@ def _detect_document_type(text: str, filename: str, folder: str, text_source: st
     t = text
     fn = filename.lower()
 
+    # A filename that plainly names a non-exam artefact overrides the exam
+    # heuristics (a "...-practical.pdf" that mentions "MST" in a header is a lab
+    # record, not a question paper).
+    non_exam_fn = any(k in fn for k in ("practical", "lab-manual", "labmanual", "lab-record",
+                                        "laboratory-manual", "syllabus", "question-bank", "qbank",
+                                        "eng-lab", "english-lab", "-labmanual"))
+
     # 1. Exam paper — reliable and high-value, so it wins even over filename tokens.
     exam_hits = sum(1 for p in EXAM_PHRASES if p in t)
     mst = RE_MST.search(t) or RE_MST.search(fn)
@@ -218,7 +225,7 @@ def _detect_document_type(text: str, filename: str, folder: str, text_source: st
                     "sample-paper", "model-paper", "-paper", "question-paper"]
     is_paperish = any(k in fn for k in paper_tokens)
 
-    if exam_hits >= 2 or (exam_hits >= 1 and is_paperish) or mst or is_paperish:
+    if not non_exam_fn and (exam_hits >= 2 or (exam_hits >= 1 and is_paperish) or mst or is_paperish):
         exam_type = "UNKNOWN"
         if mst:
             g = mst.group(1) or mst.group(2)
@@ -324,9 +331,22 @@ def classify(*, resource_id: str, file_url: str, original_filename: str, filetyp
 
     if len(code_matches) == 1:
         chosen = code_matches[0]
-        subj_conf = 0.85
         p.course_code = chosen.code
-        p.signals.append(f"course code {chosen.code}")
+        folder_code = category_default_subject.get(folder)
+        contradicts = (
+            chosen.code not in (current_subject_code, folder_code)
+            and folder not in ("", "general")
+        )
+        if contradicts:
+            # a lone course-code hit that disagrees with both the current
+            # subject and the upload folder is more likely OCR noise
+            subj_conf = 0.55
+            p.signals.append(
+                f"course code {chosen.code} found but contradicts folder/{current_subject_code} — review"
+            )
+        else:
+            subj_conf = 0.85
+            p.signals.append(f"course code {chosen.code}")
     elif len(code_matches) > 1 and kw_best in code_matches:
         chosen = kw_best
         subj_conf = 0.7
@@ -406,12 +426,15 @@ def classify(*, resource_id: str, file_url: str, original_filename: str, filetyp
     years = [int(y) for y in RE_YEAR.findall(text + " " + filename) if 2010 <= int(y) <= 2027]
     if years:
         p.academic_year = max(years) if dt == "previous_year_question_paper" else min(years)
-    um = RE_UNIT.search(text) or RE_UNIT.search(filename)
+    # Unit: only trust an explicit "unitN" in the *filename* — a stray "unit 3"
+    # somewhere in OCR'd body text is not reliable enough to name a file by.
+    um_fn = RE_UNIT.search(filename)
+    um = um_fn or RE_UNIT.search(text)
     if um:
         n = int(um.group(1))
         if chosen and (not chosen.units or n <= len(chosen.units)):
             p.unit = n
-            if chosen.units and n <= len(chosen.units):
+            if um_fn and chosen.units and n <= len(chosen.units):
                 p.topics = [chosen.units[n - 1]]
 
     # ── Confidence + status ─────────────────────────────────────────────
@@ -461,13 +484,14 @@ def _suggest_names(p: Proposal, subj: Subject | None) -> tuple[str | None, str |
     if not subj or not p.document_type or p.needs_review:
         return None, None  # never rename on a guess (PHASE 6)
     parts = [subj.name, DOC_TYPE_TITLE.get(p.document_type, p.document_type)]
+    unit_in_fn = bool(RE_UNIT.search((p.original_filename or "").lower()))
     qualifier = None
     if p.document_type == "previous_year_question_paper":
         bits = [EXAM_TITLE.get(p.exam_type or "", ""), str(p.academic_year or "")]
         qualifier = " ".join(b for b in bits if b).strip()
-    elif p.topics:
+    elif p.topics and unit_in_fn:
         qualifier = p.topics[0]
-    elif p.unit:
+    elif p.unit and unit_in_fn:
         qualifier = f"Unit {p.unit}"
     if qualifier:
         parts.append(qualifier)
