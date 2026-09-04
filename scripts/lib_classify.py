@@ -302,13 +302,25 @@ def classify(*, resource_id: str, file_url: str, original_filename: str, filetyp
     subj_conf = 0.0
     chosen: Subject | None = None
 
+    # Guard: material explicitly for a later year isn't a first-year subject.
+    not_first_year = bool(
+        re.search(r"\b(2nd|second|3rd|third|4th|final)[-\s]?year\b", filename)
+        or re.search(r"\b(2nd|second|3rd|third)[-\s]?year\b", text[:2000])
+    )
+
     code_matches = _match_course_codes(text, filename, subjects)
     ranking = _subject_keyword_ranking(text, subjects)
     kw_best, kw_score = (ranking[0] if ranking else (None, 0.0))
     kw_margin = (ranking[0][1] - ranking[1][1]) if len(ranking) > 1 else kw_score
 
-    default_code = category_default_subject.get(folder)
-    default_subj = next((s for s in subjects if s.code == default_code), None)
+    # The current DB subject already encodes the seed's folder mapping *plus*
+    # its hand-curated per-file overrides (e.g. workshop casting -> IP10584),
+    # so it is a better prior than the raw folder. Fall back to the folder
+    # only when the row has no usable current subject.
+    by_code = {s.code: s for s in subjects}
+    default_subj = by_code.get(current_subject_code) or by_code.get(
+        category_default_subject.get(folder, "")
+    )
 
     if len(code_matches) == 1:
         chosen = code_matches[0]
@@ -319,26 +331,41 @@ def classify(*, resource_id: str, file_url: str, original_filename: str, filetyp
         chosen = kw_best
         subj_conf = 0.7
         p.signals.append(f"multiple course codes, keywords favour {chosen.code}")
-    elif kw_best and kw_score > 0.30 and kw_margin > 0.10:
-        chosen = kw_best
-        subj_conf = min(0.45 + kw_score, 0.8)
-        p.signals.append(f"subject keywords -> {chosen.code} (score {kw_score:.2f}, margin {kw_margin:.2f})")
-    elif kw_best and kw_score > 0.18 and kw_margin > 0.06 and (
-        default_subj is None or kw_best.id == default_subj.id or folder == "general"
-    ):
-        # modest keyword signal — only trust it if it doesn't contradict a
-        # non-general upload folder
-        chosen = kw_best
-        subj_conf = min(0.35 + kw_score, 0.6)
-        p.signals.append(f"weak subject keywords -> {chosen.code} (score {kw_score:.2f})")
+    else:
+        # No course code. The upload folder is curated seed data (hand-mapped,
+        # with explicit per-file overrides), so treat it as a strong prior:
+        # keyword matching may only *override* a non-general folder when it is
+        # both very strong and decisive; otherwise it can only *confirm* it.
+        has_prior = default_subj is not None and default_subj.code != "GN00001"
+        agrees = kw_best is not None and default_subj is not None and kw_best.id == default_subj.id
 
-    if chosen is None and default_subj is not None and folder != "general":
-        chosen = default_subj
-        subj_conf = 0.35
-        p.signals.append(f"upload folder default -> {chosen.code}")
-    elif chosen is not None and default_subj is not None and chosen.id == default_subj.id:
-        subj_conf = min(subj_conf + 0.1, 1.0)
-        p.signals.append("agrees with folder default")
+        if kw_best and agrees and kw_score > 0.15:
+            chosen = kw_best
+            subj_conf = min(0.55 + kw_score, 0.85)
+            p.signals.append(f"prior + keywords agree -> {chosen.code} (score {kw_score:.2f})")
+        elif has_prior:
+            # Keyword matching against the small syllabus is too noisy to
+            # override the curated prior without a course code — keep it,
+            # flag divergent keyword hints for the reviewer.
+            chosen = default_subj
+            subj_conf = 0.5
+            note = f"kept current subject {chosen.code}"
+            if kw_best and kw_best.id != default_subj.id and kw_score > 0.35:
+                note += f" (content also mentions {kw_best.code} terms — confirm on review)"
+                subj_conf = 0.42
+            p.signals.append(note)
+        elif kw_best and kw_score > 0.30 and kw_margin > 0.12:
+            # No prior (general bucket). A keyword hint is worth recording but
+            # never confident enough to auto-apply.
+            chosen = kw_best
+            subj_conf = min(0.4 + kw_score, 0.58)
+            p.signals.append(f"subject keywords (no prior) -> {chosen.code} (score {kw_score:.2f})")
+
+    if not_first_year and len(code_matches) != 1:
+        # Don't pin later-year material onto a first-year subject.
+        chosen = None
+        subj_conf = 0.0
+        p.signals.append("filename/'content' says a later year — not a first-year subject")
 
     if chosen:
         p.subject_id = chosen.id
@@ -355,6 +382,25 @@ def classify(*, resource_id: str, file_url: str, original_filename: str, filetyp
     p.exam_type = exam_type
     p.doctype_confidence = dt_conf
     p.signals += dt_sig
+
+    # A whole-programme / whole-semester syllabus covers every subject — it
+    # must not be pinned to one. Same for cross-subject PYQ compilations.
+    broad = re.search(r"(sgsits-syllabus|1st-year|first-year|2nd-sem|second-sem|sem[-\s]?a\b|"
+                      r"semester[-\s]?\d|all[-\s]?subjects|compilation)", filename)
+    many_codes = len({m.code for m in code_matches}) >= 3
+    if (
+        (dt == "syllabus" and broad)
+        or (dt == "previous_year_question_paper" and ("all-subject" in filename or broad))
+        or many_codes
+        or "sgsits-syllabus" in filename
+    ):
+        chosen = None
+        p.subject_id = None
+        p.subject_code = None
+        p.subject_confidence = 0.0
+        subj_conf = 0.0
+        p.academic_area = "general"
+        p.signals.append("covers multiple subjects — not pinned to one")
 
     # ── Metadata ────────────────────────────────────────────────────────
     years = [int(y) for y in RE_YEAR.findall(text + " " + filename) if 2010 <= int(y) <= 2027]
