@@ -4,24 +4,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import Modal from '@/components/ui/Modal';
-import { Bookmark, Download, Share, Flag, Star } from 'lucide-react';
+import { Bookmark, Share, Flag, Star } from 'lucide-react';
 
 export default function ResourceActionsPanel({
   resourceId,
-  fileUrl,
 }: {
   resourceId: string;
-  fileUrl: string;
+  fileUrl?: string;
   fileName?: string;
 }) {
   const { toast } = useToast();
   const [reportOpen, setReportOpen] = useState(false);
-
-  const download = async () => {
-    toast('Download started', 'success');
-    window.open(fileUrl, '_blank');
-    await fetch(`/api/resources/${resourceId}/download`, { method: 'POST' });
-  };
 
   const bookmark = async () => {
     await fetch(`/api/resources/${resourceId}/bookmark`, { method: 'POST' });
@@ -35,10 +28,7 @@ export default function ResourceActionsPanel({
 
   return (
     <div className="flex flex-col gap-2">
-      <Button variant="primary" onClick={download} className="w-full justify-center gap-2">
-        <Download size={18} /> Download
-      </Button>
-      <Button variant="secondary" onClick={bookmark} className="w-full justify-center gap-2">
+      <Button variant="primary" onClick={bookmark} className="w-full justify-center gap-2">
         <Bookmark size={18} /> Save Note
       </Button>
       <div className="flex gap-2">
@@ -49,7 +39,7 @@ export default function ResourceActionsPanel({
           <Flag size={18} />
         </Button>
       </div>
-      
+
       <div className="mt-2 pt-2 border-t border-border flex justify-center gap-1">
         {[1,2,3,4,5].map(i => (
           <Star key={i} size={20} className="text-muted hover:text-ochre-500 cursor-pointer transition-colors" />

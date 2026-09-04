@@ -1,12 +1,14 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { Search } from 'lucide-react';
+import { Search, Menu } from 'lucide-react';
 import { useEffect } from 'react';
 import UserMenu from './UserMenu';
+import { useShell } from './ShellContext';
 
 export default function TopBar() {
   const { data: session } = useSession();
+  const { toggleSidebar } = useShell();
 
   // Expose global opener for Ctrl/Cmd+K
   useEffect(() => {
@@ -22,6 +24,15 @@ export default function TopBar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-surface px-8 md:px-10">
+      <button
+        type="button"
+        onClick={toggleSidebar}
+        className="hidden md:flex h-9 w-9 shrink-0 items-center justify-center rounded-button border border-border bg-background text-secondary transition duration-calm ease-calm hover:border-sage-300 hover:text-ink"
+        aria-label="Toggle sidebar"
+      >
+        <Menu size={17} strokeWidth={1.8} />
+      </button>
+
       <button
         type="button"
         onClick={() => window.dispatchEvent(new CustomEvent('open-palette'))}

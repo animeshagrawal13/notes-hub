@@ -169,3 +169,173 @@ textarea:focus-visible {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Homepage landing — a self-contained skin that mirrors the SGSITS Notes Hub
+   reference design (blue + ochre, near-white canvas, glass cards). Scoped to
+   `.home` so it never leaks into the sage-toned app shell.
+   --------------------------------------------------------------------------- */
+.home {
+  --h-bg: #fafbfd;
+  --h-card: #ffffff;
+  --h-ink: #0b1120;
+  --h-soft: #475569;
+  --h-faint: #94a3b8;
+  --h-border: #e8ecf3;
+  --h-primary: #1e40af;
+  --h-primary-pale: #eef2ff;
+  --h-primary-glow: rgba(30, 64, 175, 0.1);
+  --h-accent: #b45309;
+  --h-accent-pale: #fef3c7;
+  --h-accent-glow: rgba(180, 83, 9, 0.1);
+  --h-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+  --h-shadow-lg: 0 4px 8px -2px rgba(15, 23, 42, 0.06), 0 20px 40px -8px rgba(15, 23, 42, 0.12),
+    0 0 0 1px rgba(15, 23, 42, 0.02);
+  color: var(--h-ink);
+}
+
+/* Full-bleed near-white canvas behind the landing, without disturbing the shell.
+   Fixed so it covers the viewport at any scroll position; sits behind all
+   content (the sidebar paints its own surface on top). */
+.home::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--h-bg);
+  pointer-events: none;
+}
+
+.home-display {
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.home-hero-wrap {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.home-hero-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(30, 64, 175, 0.08), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 85% 15%, rgba(180, 83, 9, 0.06), transparent 60%);
+}
+
+.home-hero {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 48px 16px 56px;
+}
+
+.home-hero h1 {
+  font-size: clamp(2.5rem, 5.5vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  margin-bottom: 18px;
+  color: var(--h-ink);
+}
+
+.home-hero p {
+  color: var(--h-soft);
+  font-size: 1.08rem;
+  line-height: 1.65;
+  margin-bottom: 32px;
+}
+
+.home-grad {
+  background: linear-gradient(45deg, var(--h-primary), var(--h-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.home-search {
+  width: 100%;
+  padding: 16px 18px 16px 48px;
+  border-radius: 14px;
+  border: 1px solid var(--h-border);
+  background: var(--h-card);
+  color: var(--h-ink);
+  font-size: 0.95rem;
+  box-shadow: var(--h-shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.home-search::placeholder {
+  color: var(--h-faint);
+}
+
+.home-search:focus {
+  outline: none;
+  border-color: var(--h-primary);
+  box-shadow: 0 0 0 4px var(--h-primary-glow), var(--h-shadow);
+}
+
+.home-badge {
+  font-size: 0.68rem;
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.home-badge-blue {
+  background: var(--h-primary-pale);
+  color: var(--h-primary);
+}
+
+.home-badge-gold {
+  background: var(--h-accent-pale);
+  color: var(--h-accent);
+}
+
+.home-badge-soft {
+  background: var(--h-bg);
+  color: var(--h-soft);
+  border: 1px solid var(--h-border);
+}
+
+.home-card {
+  background: var(--h-card);
+  border: 1px solid var(--h-border);
+  border-radius: 18px;
+  box-shadow: var(--h-shadow);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s, border-color 0.25s;
+}
+
+.home-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--h-shadow-lg);
+  border-color: var(--h-primary);
+}
+
+.home-section-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--h-ink);
+}
+
+.home-foot {
+  border-top: 1px solid var(--h-border);
+  color: var(--h-soft);
+}
+
+.home-foot a {
+  color: var(--h-soft);
+  transition: color 0.15s;
+}
+
+.home-foot a:hover {
+  color: var(--h-primary);
+}

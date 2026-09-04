@@ -55,7 +55,7 @@ export default async function NoteDetailPage({ params }: { params: { id: string 
             <iframe src={`${resource.fileUrl}#toolbar=0`} className="w-full h-full border-0 bg-elevated" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-muted text-body">
-              Preview not available for this file type. Please download to view.
+              Preview not available for this file type.
             </div>
           )}
         </div>

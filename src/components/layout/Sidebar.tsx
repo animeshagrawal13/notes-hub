@@ -12,6 +12,7 @@ import {
   ShieldCheck, ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useShell } from './ShellContext';
 
 const NAV_ITEMS = [
   { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -30,6 +31,7 @@ const NAV_SECONDARY = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { sidebarOpen } = useShell();
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/';
@@ -53,7 +55,13 @@ export default function Sidebar() {
   );
 
   return (
-    <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-sidebar flex-col bg-surface border-r border-border thin-scroll overflow-y-auto">
+    <aside
+      className={cn(
+        'hidden md:flex fixed inset-y-0 left-0 z-40 w-sidebar flex-col bg-surface border-r border-border thin-scroll overflow-y-auto',
+        'transition-transform duration-calm ease-calm',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      )}
+    >
       {/* Wordmark */}
       <Link href="/" className="flex items-center gap-3 px-5 py-5 shrink-0">
         <span className="flex h-9 w-9 items-center justify-center rounded-button bg-sage-100 text-sage-700">

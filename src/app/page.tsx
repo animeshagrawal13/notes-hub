@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
 import PageHeader from '@/components/ui/PageHeader';
 import StatCard from '@/components/ui/StatCard';
 import SubjectCard from '@/components/ui/SubjectCard';
@@ -6,9 +7,8 @@ import NoteListItem from '@/components/ui/NoteListItem';
 import NoteListTable from '@/components/ui/NoteListTable';
 import EmptyState from '@/components/ui/EmptyState';
 import { LinkButton } from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
 import { auth } from '@/lib/auth';
-import { LibraryBig, FileText, Bookmark, Upload, CalendarDays, Search } from 'lucide-react';
+import { LibraryBig, FileText, Bookmark, Upload, CalendarDays, Search, ChevronRight } from 'lucide-react';
 import { daysUntil } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +43,7 @@ export default async function HomePage() {
     return (
       <div className="space-y-8">
         <PageHeader title={`Welcome back, ${firstName}`} subtitle="Here's what's happening with your notes." />
-        
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard label="Subjects" value={subjectCount} Icon={LibraryBig} tint="sage" href="/subjects" />
           <StatCard label="Notes" value={noteCount} Icon={FileText} tint="slate" href="/notes" />
@@ -97,46 +97,155 @@ export default async function HomePage() {
     );
   }
 
-  // Signed out
-  const [topSubjects, topNotes] = await Promise.all([
-    prisma.subject.findMany({ take: 8, orderBy: { resources: { _count: 'desc' } }, include: { _count: { select: { resources: true } } } }),
-    prisma.resource.findMany({ take: 6, orderBy: { downloads: 'desc' }, where: { status: 'APPROVED' }, include: { subject: true } })
+  // ── Signed out — landing page (SGSITS Notes Hub reference design) ──────────
+  const [topSubjects, topNotes, allSubjects] = await Promise.all([
+    prisma.subject.findMany({
+      take: 8,
+      orderBy: { resources: { _count: 'desc' } },
+      include: { _count: { select: { resources: true } } },
+    }),
+    prisma.resource.findMany({
+      take: 6,
+      orderBy: { downloads: 'desc' },
+      where: { status: 'APPROVED' },
+      include: { subject: true },
+    }),
+    prisma.subject.findMany({ include: { semester: true }, orderBy: { name: 'asc' } }),
   ]);
 
+  const firstYear = allSubjects.filter(s => s.semester?.year === 1);
+  const sem1 = firstYear.filter(s => s.semester?.number === 1);
+  const sem2 = firstYear.filter(s => s.semester?.number === 2);
+  const names = (list: typeof allSubjects) =>
+    list.map(s => s.name).slice(0, 5).join(', ') + (list.length ? '.' : '');
+
+  const semCards = [
+    { href: '/subjects', label: 'Semester I', count: sem1.length, subjects: names(sem1), tone: 'blue' as const },
+    { href: '/subjects', label: 'Semester II', count: sem2.length, subjects: names(sem2), tone: 'gold' as const },
+  ];
+
   return (
-    <div className="space-y-12">
-      <div className="text-center max-w-2xl mx-auto mt-12 space-y-6">
-        <PageHeader title="B.Tech First Year Notes & Syllabus Hub" subtitle="The best place to find, share, and organize your college study materials." />
-        
-        <form action="/notes" className="relative max-w-lg mx-auto">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} />
-          <input type="text" name="q" placeholder="Search notes, PYQs, subjects..." className="w-full pl-10 pr-4 h-12 rounded-input border border-border bg-surface text-body text-ink shadow-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
-        </form>
-
-        <div className="flex justify-center gap-4">
-          <LinkButton href="/browse" variant="primary" size="lg">Find My Notes</LinkButton>
-          <LinkButton href="/uploads" variant="secondary" size="lg">Upload Notes</LinkButton>
-        </div>
-
-        <div className="flex justify-center gap-3 flex-wrap pt-4">
-          <Badge tone="neutral">NAAC Grade A</Badge>
-          <Badge tone="neutral">RGPV Affiliated</Badge>
-          <Badge tone="neutral">Autonomous</Badge>
-          <Badge tone="neutral">Estd. 1952</Badge>
+    <div className="home space-y-16">
+      {/* Hero */}
+      <div className="home-hero-wrap">
+        <div className="home-hero">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+            <span className="home-badge home-badge-blue">Estd. 1952</span>
+            <span className="home-badge home-badge-soft">Autonomous Institute</span>
+            <span className="home-badge home-badge-soft">RGPV Affiliated</span>
+          </div>
+          <h1 className="home-display">
+            B.Tech First Year<br />
+            <span className="home-grad">Notes Hub</span>
+          </h1>
+          <p>
+            Unit-wise notes, official syllabus, class slides and previous year question
+            papers for every first-year subject at SGSITS, Indore.
+          </p>
+          <form action="/notes" className="relative mx-auto max-w-[540px]">
+            <Search
+              className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
+              size={20}
+              style={{ color: 'var(--h-faint)' }}
+            />
+            <input
+              type="text"
+              name="q"
+              autoComplete="off"
+              placeholder={'Search subject or code — e.g. "Physics" or "IT10007"'}
+              className="home-search"
+            />
+          </form>
         </div>
       </div>
 
+      {/* Semester cards */}
+      <div className="grid gap-6 sm:grid-cols-2">
+        {semCards.map(card => (
+          <Link
+            key={card.label}
+            href={card.href}
+            className="home-card group relative overflow-hidden p-9"
+            style={{ borderTop: `4px solid ${card.tone === 'blue' ? 'var(--h-primary)' : 'var(--h-accent)'}` }}
+          >
+            <div
+              className="pointer-events-none absolute right-0 top-0 h-32 w-32"
+              style={{
+                background: `radial-gradient(circle at top right, ${
+                  card.tone === 'blue' ? 'var(--h-primary-glow)' : 'var(--h-accent-glow)'
+                }, transparent 70%)`,
+              }}
+            />
+            <div className="relative mb-5 flex items-center justify-between">
+              <span className={`home-badge ${card.tone === 'blue' ? 'home-badge-blue' : 'home-badge-gold'}`}>
+                {card.count} subjects
+              </span>
+              <ChevronRight
+                size={22}
+                style={{ color: card.tone === 'blue' ? 'var(--h-primary)' : 'var(--h-accent)' }}
+              />
+            </div>
+            <h2 className="home-display relative mb-2.5 text-[1.85rem] font-bold" style={{ color: 'var(--h-ink)' }}>
+              {card.label}
+            </h2>
+            <p className="relative text-[0.92rem] leading-relaxed" style={{ color: 'var(--h-soft)' }}>
+              {card.subjects || 'Subjects coming soon.'}
+            </p>
+          </Link>
+        ))}
+      </div>
+
+      {/* Popular subjects */}
       <div className="space-y-4">
-        <h2 className="text-card-title font-semibold text-ink">Popular Subjects</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {topSubjects.map(s => <SubjectCard key={s.id} id={s.id} name={s.name} code={s.code || undefined} notes={s._count.resources} layout="grid" />)}
+        <h2 className="home-section-title">Popular Subjects</h2>
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {topSubjects.map(s => (
+            <SubjectCard key={s.id} id={s.id} name={s.name} code={s.code || undefined} notes={s._count.resources} layout="grid" />
+          ))}
         </div>
       </div>
 
+      {/* Trending notes */}
       <div className="space-y-4">
-        <h2 className="text-card-title font-semibold text-ink">Trending Notes</h2>
+        <h2 className="home-section-title">Trending Notes</h2>
         <NoteListTable notes={topNotes as any[]} />
       </div>
+
+      {/* Footer */}
+      <footer className="home-foot grid gap-10 pt-12 sm:grid-cols-3">
+        <div>
+          <div className="home-display mb-3 text-[0.95rem] font-bold" style={{ color: 'var(--h-ink)' }}>
+            SGSITS, Indore
+          </div>
+          <p className="text-[0.85rem] leading-relaxed">
+            Shri G. S. Institute of Technology &amp; Science. Autonomous Institute, Govt. of M.P.
+            Affiliated to RGPV, Bhopal.
+          </p>
+        </div>
+        <div>
+          <div className="home-display mb-3 text-[0.95rem] font-bold" style={{ color: 'var(--h-ink)' }}>
+            Quick Links
+          </div>
+          <Link href="/subjects" className="block py-1 text-[0.85rem]">Subjects</Link>
+          <Link href="/notes" className="block py-1 text-[0.85rem]">Notes</Link>
+          <Link href="/pyq" className="block py-1 text-[0.85rem]">PYQ Papers</Link>
+          <a href="https://www.sgsits.ac.in/" target="_blank" rel="noopener noreferrer" className="block py-1 text-[0.85rem]">
+            Official Website ↗
+          </a>
+        </div>
+        <div>
+          <div className="home-display mb-3 text-[0.95rem] font-bold" style={{ color: 'var(--h-ink)' }}>
+            Contact
+          </div>
+          <p className="text-[0.85rem] leading-loose">
+            23, Sir M. Visvesvaraya Marg<br />
+            Indore, M.P. 452003
+          </p>
+        </div>
+      </footer>
+      <p className="home-foot pt-6 text-center text-[0.75rem]" style={{ color: 'var(--h-faint)' }}>
+        A student-driven resource for B.Tech 1st Year · Unofficial
+      </p>
     </div>
   );
 }

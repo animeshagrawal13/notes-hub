@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
 import { TypeBadge } from '@/components/ui/Badge';
-import { Download, FileText, Star } from 'lucide-react';
+import { Eye, FileText, Star } from 'lucide-react';
 import { formatSize } from '@/lib/format';
 
 type ResourceCardData = {
@@ -46,7 +46,7 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
 
         <div className="flex items-center justify-between text-meta text-secondary mt-auto pt-2 border-t border-border-light">
           <span className="flex items-center gap-1">
-            <Download size={13} /> {resource.downloads}
+            <Eye size={13} /> {resource.views}
           </span>
           {avg !== null ? (
             <span className="flex items-center gap-1 text-sage-700">

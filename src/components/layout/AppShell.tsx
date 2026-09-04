@@ -1,5 +1,6 @@
-﻿'use client';
-// Fixed sidebar (240px) + fluid main column on md+.
+'use client';
+// Fixed sidebar (240px) + fluid main column on md+, collapsible via the ☰
+// button in TopBar (state in ShellContext, persisted to localStorage).
 // For /login and /register renders children centered with no sidebar.
 // Mounts ToastProvider and CommandPalette once globally.
 
@@ -9,37 +10,53 @@ import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import CommandPalette from './CommandPalette';
+import { ShellProvider, useShell } from './ShellContext';
 import { ToastProvider } from '@/components/ui/Toast';
+import { cn } from '@/lib/cn';
 
 const NO_SHELL_PATHS = ['/login', '/register'];
 
-export default function AppShell({ children }: { children: ReactNode }) {
+function ShellBody({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { sidebarOpen } = useShell();
   const bare = NO_SHELL_PATHS.some((p) => pathname === p || pathname?.startsWith(p + '/'));
 
   if (bare) {
     return (
-      <ToastProvider>
-        <div className="min-h-screen bg-background flex items-center justify-center px-5 py-16">
-          {children}
-        </div>
-      </ToastProvider>
+      <div className="min-h-screen bg-background flex items-center justify-center px-5 py-16">
+        {children}
+      </div>
     );
   }
 
   return (
-    <ToastProvider>
+    <>
       <CommandPalette />
-      {/* Sidebar — hidden on mobile, fixed on md+ */}
+      {/* Sidebar — hidden on mobile, fixed on md+, slides out when collapsed */}
       <Sidebar />
-      {/* Main column offset by sidebar width on md+ */}
-      <div className="md:pl-sidebar flex flex-col min-h-screen">
+      {/* Main column offset by sidebar width on md+ only while the sidebar is open */}
+      <div
+        className={cn(
+          'flex flex-col min-h-screen transition-[padding] duration-calm ease-calm',
+          sidebarOpen ? 'md:pl-sidebar' : 'md:pl-0'
+        )}
+      >
         <TopBar />
         <main className="flex-1 px-8 py-8 md:px-10 md:py-10 max-w-shell w-full mx-auto">
           {children}
         </main>
       </div>
       <BottomNav />
+    </>
+  );
+}
+
+export default function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <ToastProvider>
+      <ShellProvider>
+        <ShellBody>{children}</ShellBody>
+      </ShellProvider>
     </ToastProvider>
   );
 }
