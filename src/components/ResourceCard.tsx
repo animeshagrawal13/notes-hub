@@ -1,6 +1,8 @@
-import Link from "next/link";
-import TiltCard from "@/components/TiltCard";
-import { Download, FileText, Star } from "lucide-react";
+import Link from 'next/link';
+import Card from '@/components/ui/Card';
+import { TypeBadge } from '@/components/ui/Badge';
+import { Download, FileText, Star } from 'lucide-react';
+import { formatSize } from '@/lib/format';
 
 type ResourceCardData = {
   id: string;
@@ -15,11 +17,6 @@ type ResourceCardData = {
   ratings?: { stars: number }[];
 };
 
-function formatSize(bytes: number) {
-  if (bytes > 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
-}
-
 export default function ResourceCard({ resource }: { resource: ResourceCardData }) {
   const avg =
     resource.ratings && resource.ratings.length > 0
@@ -27,18 +24,18 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
       : null;
 
   return (
-    <Link href={`/resource/${resource.id}`}>
-      <TiltCard className="p-4 h-full flex flex-col gap-2">
+    <Link href={`/notes/${resource.id}`}>
+      <Card hover className="p-4 h-full flex flex-col gap-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
-            <FileText size={18} style={{ color: "var(--primary)" }} className="shrink-0" />
-            <p className="font-medium text-sm truncate">{resource.title}</p>
+            <FileText size={18} className="text-sage-600 shrink-0" />
+            <p className="font-semibold text-body-lg text-ink truncate">{resource.title}</p>
           </div>
-          <span className="badge badge-soft shrink-0">{resource.fileType}</span>
+          <span className="text-micro text-muted shrink-0 uppercase">{resource.fileType}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-[var(--faint)]">
-          <span className="badge badge-blue">{resource.type.replace(/_/g, " ")}</span>
+        <div className="flex items-center gap-2 text-meta text-muted">
+          <TypeBadge type={resource.type} />
           {resource.topic ? (
             <span>{resource.topic.name}</span>
           ) : (
@@ -47,19 +44,19 @@ export default function ResourceCard({ resource }: { resource: ResourceCardData 
           <span>{formatSize(resource.fileSize)}</span>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-[var(--soft)] mt-auto pt-2">
+        <div className="flex items-center justify-between text-meta text-secondary mt-auto pt-2 border-t border-border-light">
           <span className="flex items-center gap-1">
             <Download size={13} /> {resource.downloads}
           </span>
           {avg !== null ? (
-            <span className="flex items-center gap-1">
-              <Star size={13} fill="var(--accent)" style={{ color: "var(--accent)" }} /> {avg.toFixed(1)}
+            <span className="flex items-center gap-1 text-sage-700">
+              <Star size={13} className="fill-current text-sage-600" /> {avg.toFixed(1)}
             </span>
           ) : (
-            <span className="text-[var(--faint)]">No ratings yet</span>
+            <span className="text-muted">No ratings</span>
           )}
         </div>
-      </TiltCard>
+      </Card>
     </Link>
   );
 }

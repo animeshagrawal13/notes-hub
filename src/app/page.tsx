@@ -1,154 +1,142 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import TiltCard from "@/components/TiltCard";
-import { ArrowRight, Download, Search, Star, TrendingUp, Upload } from "lucide-react";
+import { prisma } from '@/lib/prisma';
+import PageHeader from '@/components/ui/PageHeader';
+import StatCard from '@/components/ui/StatCard';
+import SubjectCard from '@/components/ui/SubjectCard';
+import NoteListItem from '@/components/ui/NoteListItem';
+import NoteListTable from '@/components/ui/NoteListTable';
+import EmptyState from '@/components/ui/EmptyState';
+import { LinkButton } from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
+import { auth } from '@/lib/auth';
+import { LibraryBig, FileText, Bookmark, Upload, CalendarDays, Search } from 'lucide-react';
+import { daysUntil } from '@/lib/format';
 
-export const dynamic = "force-dynamic";
-
-const BADGES = ["NAAC Grade A", "RGPV Affiliated", "Autonomous · Estd. 1952", "Common to All Branches"];
-
-async function getHomeData() {
-  const [popularSubjects, trending, recent] = await Promise.all([
-    prisma.subject.findMany({
-      where: { resources: { some: {} } },
-      take: 6,
-      include: { _count: { select: { resources: true } } },
-      orderBy: { resources: { _count: "desc" } },
-    }),
-    prisma.resource.findMany({
-      where: { status: "APPROVED" },
-      take: 4,
-      orderBy: { downloads: "desc" },
-      include: { subject: true },
-    }),
-    prisma.resource.findMany({
-      where: { status: "APPROVED" },
-      take: 4,
-      orderBy: { createdAt: "desc" },
-      include: { subject: true },
-    }),
-  ]);
-  return { popularSubjects, trending, recent };
-}
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const { popularSubjects, trending, recent } = await getHomeData();
+  const session = await auth();
+
+  if (session?.user) {
+    const [subjectCount, noteCount, bookmarkCount, uploadCount, recentBookmarks, upcomingEvents] = await Promise.all([
+      prisma.subject.count(),
+      prisma.resource.count({ where: { status: 'APPROVED' } }),
+      prisma.bookmark.count({ where: { userId: session.user.id } }),
+      prisma.resource.count({ where: { uploadedById: session.user.id } }),
+      prisma.bookmark.findMany({
+        where: { userId: session.user.id },
+        take: 6,
+        orderBy: { createdAt: 'desc' },
+        include: { resource: { include: { subject: true, unit: true } } },
+      }),
+      prisma.studyEvent.findMany({
+        where: {
+          date: { gte: new Date() },
+          OR: [{ userId: null }, { userId: session.user.id }],
+        },
+        orderBy: { date: 'asc' },
+        take: 5,
+      }),
+    ]);
+
+    const firstName = session.user.name?.split(' ')[0] || 'User';
+
+    return (
+      <div className="space-y-8">
+        <PageHeader title={`Welcome back, ${firstName}`} subtitle="Here's what's happening with your notes." />
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard label="Subjects" value={subjectCount} Icon={LibraryBig} tint="sage" href="/subjects" />
+          <StatCard label="Notes" value={noteCount} Icon={FileText} tint="slate" href="/notes" />
+          <StatCard label="Bookmarks" value={bookmarkCount} Icon={Bookmark} tint="lavender" href="/bookmarks" />
+          <StatCard label="My Uploads" value={uploadCount} Icon={Upload} tint="ochre" href="/uploads" />
+        </div>
+
+        <div className="flex gap-4">
+          <LinkButton variant="primary" href="/uploads" size="md">Upload Notes</LinkButton>
+          <LinkButton variant="secondary" href="/notes" size="md">Search Notes</LinkButton>
+          <LinkButton variant="secondary" href="/pyq" size="md">Explore PYQs</LinkButton>
+          <LinkButton variant="secondary" href="/browse" size="md">Browse by College</LinkButton>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-4">
+            <h2 className="text-card-title font-semibold text-ink">Continue where you left off</h2>
+            {recentBookmarks.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {recentBookmarks.map(b => (
+                  <NoteListItem key={b.id} note={b.resource as any} variant="row" right={<Bookmark className="text-sage-600 fill-sage-600" size={18} />} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState title="No bookmarks yet" body="Save notes to quickly access them here." Icon={Bookmark} action={<LinkButton href="/notes">Find Notes</LinkButton>} />
+            )}
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-card-title font-semibold text-ink">Upcoming</h2>
+              <LinkButton href="/schedule" variant="tertiary" size="sm">+ Add reminder</LinkButton>
+            </div>
+            {upcomingEvents.length > 0 ? (
+              <div className="flex flex-col gap-2">
+                {upcomingEvents.map(e => (
+                  <div key={e.id} className="flex items-center justify-between p-3 bg-surface rounded-card border border-border">
+                    <div className="flex items-center gap-3">
+                      <CalendarDays size={18} className="text-muted" />
+                      <span className="text-body font-medium text-ink">{e.title}</span>
+                    </div>
+                    <span className="text-meta font-semibold text-warning" style={{ color: 'var(--warning)' }}>{daysUntil(e.date)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState title="No upcoming events" Icon={CalendarDays} />
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Signed out
+  const [topSubjects, topNotes] = await Promise.all([
+    prisma.subject.findMany({ take: 8, orderBy: { resources: { _count: 'desc' } }, include: { _count: { select: { resources: true } } } }),
+    prisma.resource.findMany({ take: 6, orderBy: { downloads: 'desc' }, where: { status: 'APPROVED' }, include: { subject: true } })
+  ]);
 
   return (
-    <main>
-      <section className="max-w-2xl mx-auto px-5 pt-16 sm:pt-20 pb-12 text-center">
-        <div className="flex flex-wrap justify-center gap-2 mb-5">
-          {BADGES.map((b) => (
-            <span key={b} className="mono text-[10px] px-3 py-1 rounded-full pill">
-              {b}
-            </span>
-          ))}
-        </div>
-        <h1 className="serif font-bold text-4xl sm:text-5xl leading-tight mb-4">
-          B.Tech First Year
-          <br />
-          <span style={{ color: "var(--blue)" }}>Notes &amp; Syllabus Hub</span>
-        </h1>
-        <p className="text-base sm:text-lg text-[var(--soft)]">
-          Unit-wise notes, official syllabus, class slides and previous year questions for every subject — Semester I &amp;
-          II.
-        </p>
-
-        <form action="/search" className="relative max-w-md mx-auto mt-8">
-          <input
-            name="q"
-            placeholder='Search e.g. "Physics" or "EE10510"…'
-            className="w-full pl-11 pr-4 py-3.5 rounded-xl border text-sm outline-none"
-            style={{ background: "var(--card)", borderColor: "var(--border)" }}
-          />
-          <Search size={18} className="absolute left-4 top-4" style={{ color: "var(--soft)" }} />
+    <div className="space-y-12">
+      <div className="text-center max-w-2xl mx-auto mt-12 space-y-6">
+        <PageHeader title="B.Tech First Year Notes & Syllabus Hub" subtitle="The best place to find, share, and organize your college study materials." />
+        
+        <form action="/notes" className="relative max-w-lg mx-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} />
+          <input type="text" name="q" placeholder="Search notes, PYQs, subjects..." className="w-full pl-10 pr-4 h-12 rounded-input border border-border bg-surface text-body text-ink shadow-sm focus:outline-none focus:ring-2 focus:ring-sage-500" />
         </form>
 
-        <div className="flex gap-3 justify-center flex-wrap mt-6">
-          <Link
-            href="/browse"
-            className="px-6 py-3 rounded-xl text-white font-semibold flex items-center gap-2"
-            style={{ background: "var(--blue)" }}
-          >
-            Find My Notes <ArrowRight size={18} />
-          </Link>
-          <Link href="/upload" className="px-6 py-3 rounded-xl font-semibold border border-[var(--border)] flex items-center gap-2 bg-white">
-            <Upload size={18} /> Upload Notes
-          </Link>
+        <div className="flex justify-center gap-4">
+          <LinkButton href="/browse" variant="primary" size="lg">Find My Notes</LinkButton>
+          <LinkButton href="/uploads" variant="secondary" size="lg">Upload Notes</LinkButton>
         </div>
-      </section>
 
-      <section className="max-w-6xl mx-auto px-5 pb-16">
-        <h2 className="serif text-xl font-bold mb-5">Popular Subjects</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {popularSubjects.map((s) => (
-            <Link key={s.id} href={`/subject/${s.id}`}>
-              <TiltCard className="p-5 h-full">
-                <p className="font-semibold mb-1">{s.name}</p>
-                <p className="mono text-xs text-[var(--faint)] mb-3">
-                  {s.code}
-                  {s.credits ? ` · ${s.credits}` : ""}
-                </p>
-                <p className="text-sm text-[var(--soft)]">{s._count.resources} resources</p>
-              </TiltCard>
-            </Link>
-          ))}
+        <div className="flex justify-center gap-3 flex-wrap pt-4">
+          <Badge tone="neutral">NAAC Grade A</Badge>
+          <Badge tone="neutral">RGPV Affiliated</Badge>
+          <Badge tone="neutral">Autonomous</Badge>
+          <Badge tone="neutral">Estd. 1952</Badge>
         </div>
-      </section>
+      </div>
 
-      <section className="max-w-6xl mx-auto px-5 pb-16 grid md:grid-cols-2 gap-10">
-        <div>
-          <h2 className="serif text-xl font-bold mb-5 flex items-center gap-2">
-            <TrendingUp size={20} /> Trending Notes
-          </h2>
-          <div className="space-y-3">
-            {trending.map((r) => (
-              <Link key={r.id} href={`/resource/${r.id}`} className="card p-4 flex items-center justify-between block">
-                <div>
-                  <p className="font-medium text-sm">{r.title}</p>
-                  <p className="mono text-xs text-[var(--faint)]">{r.subject.name}</p>
-                </div>
-                <span className="flex items-center gap-1 text-xs text-[var(--soft)]">
-                  <Download size={14} /> {r.downloads}
-                </span>
-              </Link>
-            ))}
-          </div>
+      <div className="space-y-4">
+        <h2 className="text-card-title font-semibold text-ink">Popular Subjects</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {topSubjects.map(s => <SubjectCard key={s.id} id={s.id} name={s.name} code={s.code || undefined} notes={s._count.resources} layout="grid" />)}
         </div>
-        <div>
-          <h2 className="serif text-xl font-bold mb-5 flex items-center gap-2">
-            <Star size={20} /> Recently Added
-          </h2>
-          <div className="space-y-3">
-            {recent.map((r) => (
-              <Link key={r.id} href={`/resource/${r.id}`} className="card p-4 flex items-center justify-between block">
-                <div>
-                  <p className="font-medium text-sm">{r.title}</p>
-                  <p className="mono text-xs text-[var(--faint)]">{r.subject.name}</p>
-                </div>
-                <span className="badge badge-soft">{r.type.replace(/_/g, " ")}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      </div>
 
-      <section className="max-w-6xl mx-auto px-5 pb-24">
-        <h2 className="serif text-xl font-bold mb-6 text-center">How It Works</h2>
-        <div className="grid sm:grid-cols-4 gap-4 text-center">
-          {["Choose your college", "Find your subject", "Open your notes", "Study smarter"].map((step, i) => (
-            <div key={step} className="card p-5">
-              <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold mx-auto mb-3"
-                style={{ background: "var(--blue)" }}
-              >
-                {i + 1}
-              </div>
-              <p className="text-sm font-medium">{step}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </main>
+      <div className="space-y-4">
+        <h2 className="text-card-title font-semibold text-ink">Trending Notes</h2>
+        <NoteListTable notes={topNotes as any[]} />
+      </div>
+    </div>
   );
 }

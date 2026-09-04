@@ -1,51 +1,49 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import TiltCard from "@/components/TiltCard";
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import PageHeader from '@/components/ui/PageHeader';
+import Card from '@/components/ui/Card';
+import Breadcrumb from '@/components/ui/Breadcrumb';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 const YEARS = [
-  { number: 1, label: "First Year", note: "Common curriculum — no branch selection needed" },
-  { number: 2, label: "Second Year", note: "Branch-specific" },
-  { number: 3, label: "Third Year", note: "Branch-specific" },
-  { number: 4, label: "Fourth Year", note: "Branch-specific" },
+  { id: '1', label: 'First Year', desc: 'Semesters 1 & 2' },
+  { id: '2', label: 'Second Year', desc: 'Semesters 3 & 4' },
+  { id: '3', label: 'Third Year', desc: 'Semesters 5 & 6' },
+  { id: '4', label: 'Fourth Year', desc: 'Semesters 7 & 8' },
 ];
 
-export default async function BrowseYearsPage({ params }: { params: Promise<{ collegeSlug: string }> }) {
-  const { collegeSlug } = await params;
-  const college = await prisma.college.findUnique({ where: { slug: collegeSlug } });
-  if (!college) notFound();
+export default async function BrowseYearPage({ params }: { params: { collegeSlug: string } }) {
+  const college = await prisma.college.findUnique({
+    where: { slug: params.collegeSlug }
+  });
 
-  const resourceCounts = await Promise.all(
-    YEARS.map((y) =>
-      prisma.resource.count({
-        where: { status: "APPROVED", subject: { semester: { collegeId: college.id, year: y.number } } },
-      })
-    )
-  );
+  if (!college) {
+    return <div>College not found</div>;
+  }
 
   return (
-    <main className="max-w-4xl mx-auto px-5 py-12">
-      <p className="text-sm text-[var(--faint)] mb-1">{college.name}</p>
-      <h1 className="serif text-2xl font-bold mb-2">Select Your Year</h1>
-      <p className="text-[var(--soft)] mb-8">Step 2 of 3</p>
-
-      <div className="grid sm:grid-cols-2 gap-4">
-        {YEARS.map((y, i) => {
-          const count = resourceCounts[i];
-          const enabled = count > 0;
-          return (
-            <Link key={y.number} href={enabled ? `/browse/${collegeSlug}/${y.number}` : "#"} aria-disabled={!enabled}>
-              <TiltCard className={`p-5 h-full ${!enabled ? "opacity-40 pointer-events-none" : ""}`}>
-                <p className="font-semibold mb-1">{y.label}</p>
-                <p className="text-xs text-[var(--faint)] mb-2">{y.note}</p>
-                <p className="text-sm text-[var(--soft)]">{enabled ? `${count} resources` : "Coming soon"}</p>
-              </TiltCard>
-            </Link>
-          );
-        })}
+    <div className="space-y-8">
+      <PageHeader 
+        title={`Browse ${college.name}`} 
+        subtitle="Step 2 of 3 — choose your academic year." 
+      />
+      <div className="mb-6">
+        <Breadcrumb items={[
+          { label: 'Colleges', href: '/browse' },
+          { label: college.name }
+        ]} />
       </div>
-    </main>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {YEARS.map((y) => (
+          <Link key={y.id} href={`/browse/${college.slug}/${y.id}`}>
+            <Card hover className="p-5 h-full">
+              <p className="font-semibold text-card-title text-ink">{y.label}</p>
+              <p className="text-meta text-muted">{y.desc}</p>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }

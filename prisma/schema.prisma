@@ -29,10 +29,11 @@ model User {
   branch    Branch?   @relation(fields: [branchId], references: [id])
   semester  Semester? @relation(fields: [semesterId], references: [id])
 
-  resources Resource[]
-  bookmarks Bookmark[]
-  ratings   Rating[]
-  reports   Report[]
+  resources   Resource[]
+  bookmarks   Bookmark[]
+  ratings     Rating[]
+  reports     Report[]
+  studyEvents StudyEvent[]
 }
 
 model College {
@@ -88,6 +89,7 @@ model Subject {
 
   units     Unit[]
   resources Resource[]
+  studyEvents StudyEvent[]
 
   @@unique([semesterId, code])
 }
@@ -191,4 +193,19 @@ model Report {
 
   resource Resource @relation(fields: [resourceId], references: [id])
   user     User     @relation(fields: [userId], references: [id])
+}
+
+// SQLite has no native enums; kind is EXAM | ASSIGNMENT | REMINDER
+model StudyEvent {
+  id        String   @id @default(cuid())
+  title     String
+  date      DateTime
+  kind      String   // EXAM | ASSIGNMENT | REMINDER
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id])
+  userId    String?  // null = visible to everyone (college-wide)
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@index([date])
 }

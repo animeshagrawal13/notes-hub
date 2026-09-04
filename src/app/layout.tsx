@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Merriweather, JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import AppShell from "@/components/layout/AppShell";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const merriweather = Merriweather({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-merriweather" });
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], weight: ["500", "600"], variable: "--font-jetbrains-mono" });
 
 export const metadata: Metadata = {
-  title: "SGSITS Notes Hub | B.Tech First Year",
+  title: "College Notes Hub | SGSITS B.Tech First Year",
   description:
     "Unit-wise notes, official syllabus, class slides and previous year questions for every first-year subject — Semester I & II.",
 };
@@ -21,12 +18,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={inter.variable}>
       <body className="antialiased pb-16 md:pb-0">
         <Providers>
-          <Navbar />
-          {children}
-          <Footer />
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>

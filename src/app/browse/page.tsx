@@ -1,31 +1,30 @@
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
-import TiltCard from "@/components/TiltCard";
-import { MapPin } from "lucide-react";
+import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+import { MapPin } from 'lucide-react';
+import PageHeader from '@/components/ui/PageHeader';
+import Card from '@/components/ui/Card';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export default async function BrowseCollegesPage() {
-  const colleges = await prisma.college.findMany({ orderBy: { name: "asc" } });
-
+  const colleges = await prisma.college.findMany({ orderBy: { name: 'asc' } });
+  
   return (
-    <main className="max-w-4xl mx-auto px-5 py-12">
-      <h1 className="serif text-2xl font-bold mb-2">Select Your College</h1>
-      <p className="text-[var(--soft)] mb-8">Step 1 of 3 — choose where you study.</p>
-
+    <div className="space-y-8">
+      <PageHeader title="Browse by College" subtitle="Step 1 of 3 — choose where you study." />
       <div className="grid sm:grid-cols-2 gap-4">
         {colleges.map((c) => (
           <Link key={c.id} href={`/browse/${c.slug}`}>
-            <TiltCard className="p-5 h-full flex items-start gap-3">
-              <MapPin size={20} style={{ color: "var(--primary)" }} />
+            <Card hover className="p-5 flex items-start gap-3">
+              <MapPin size={20} className="text-sage-600 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold">{c.name}</p>
-                <p className="text-sm text-[var(--faint)]">{c.city}</p>
+                <p className="font-semibold text-card-title text-ink">{c.name}</p>
+                <p className="text-meta text-muted">{c.city}</p>
               </div>
-            </TiltCard>
+            </Card>
           </Link>
         ))}
       </div>
-    </main>
+    </div>
   );
 }

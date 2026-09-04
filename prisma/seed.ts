@@ -827,6 +827,34 @@ async function main() {
   }
 
   console.log(`Seed complete. Resources created: ${created}, titles updated: ${updated}, unchanged: ${skipped}`);
+
+  // ── Study events (college-wide; idempotent via deleteMany + createMany) ──
+  const existingEventCount = await prisma.studyEvent.count();
+  if (existingEventCount === 0) {
+    const now = new Date();
+    const d = (offsetDays: number) => {
+      const dt = new Date(now);
+      dt.setHours(0, 0, 0, 0);
+      dt.setDate(dt.getDate() + offsetDays);
+      return dt;
+    };
+    await prisma.studyEvent.createMany({
+      data: [
+        { title: "Mathematics End-Semester Exam", date: d(14), kind: "EXAM" },
+        { title: "Applied Physics Mid-Semester Test", date: d(7), kind: "EXAM" },
+        { title: "Applied Chemistry End-Semester Exam", date: d(21), kind: "EXAM" },
+        { title: "IT & AI Assignment 3 Due", date: d(3), kind: "ASSIGNMENT" },
+        { title: "Engineering Graphics Submission", date: d(5), kind: "ASSIGNMENT" },
+        { title: "Electrical & Electronics Lab Record", date: d(10), kind: "ASSIGNMENT" },
+        { title: "Understanding Bharat Presentation", date: d(18), kind: "ASSIGNMENT" },
+        { title: "Design Thinking Project Deadline", date: d(28), kind: "EXAM" },
+      ],
+    });
+    console.log("Study events seeded.");
+  } else {
+    console.log(`Study events already exist (${existingEventCount}), skipping.`);
+  }
+
   console.log(`Admin login: admin@collegenoteshub.dev / Admin@123`);
   console.log(`Student login: student@collegenoteshub.dev / Student@123`);
 }
