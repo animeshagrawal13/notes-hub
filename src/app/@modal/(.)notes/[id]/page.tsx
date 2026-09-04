@@ -1,6 +1,7 @@
-// Full-page reading mode — reached by a direct visit or refresh of
-// /notes/<id> (in-app navigation is intercepted by @modal and shown as an
-// overlay instead). Same <PdfReader>; closing goes back, or to /notes.
+// Intercepting route: when a note link is followed from inside the app, render
+// the reader as an overlay on top of the page the user was on (its scroll,
+// filters and search stay put). A direct visit / refresh falls through to
+// src/app/notes/[id]/page.tsx instead.
 
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
@@ -8,17 +9,16 @@ import ReaderOverlay from '@/components/reader/ReaderOverlay';
 
 export const dynamic = 'force-dynamic';
 
-export default async function NotePage({ params }: { params: { id: string } }) {
+export default async function InterceptedNoteReader({ params }: { params: { id: string } }) {
   const resource = await prisma.resource.findUnique({
     where: { id: params.id },
     include: { subject: true, unit: true },
   });
   if (!resource) notFound();
 
-  await prisma.resource.update({
-    where: { id: resource.id },
-    data: { views: { increment: 1 } },
-  });
+  prisma.resource
+    .update({ where: { id: resource.id }, data: { views: { increment: 1 } } })
+    .catch(() => {});
 
   const subtitle = [resource.subject?.name, resource.unit ? `Unit ${resource.unit.number}` : null]
     .filter(Boolean)
@@ -31,7 +31,6 @@ export default async function NotePage({ params }: { params: { id: string } }) {
       title={resource.title}
       subtitle={subtitle || undefined}
       canRenderPdf={resource.fileUrl.toLowerCase().endsWith('.pdf')}
-      fallbackHref="/notes"
     />
   );
 }

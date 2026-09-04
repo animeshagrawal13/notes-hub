@@ -171,6 +171,47 @@ textarea:focus-visible {
 }
 
 /* ---------------------------------------------------------------------------
+   Reading mode (PdfReader) — a dedicated document workspace. A calm charcoal
+   canvas makes white pages the focus; chrome is dark translucent glass with
+   the site's sage accent kept. Scoped to `.reader`.
+   --------------------------------------------------------------------------- */
+.reader {
+  --reader-bg: #2c3033;
+  --reader-rail: #242729;
+  --reader-hairline: rgba(255, 255, 255, 0.12);
+  --reader-page-empty: rgba(255, 255, 255, 0.05);
+  --reader-chrome: rgba(26, 28, 30, 0.82);
+  --reader-chrome-hover: rgba(255, 255, 255, 0.12);
+  --reader-chrome-ink: #f3f4f6;
+  --reader-chrome-dim: #9aa0a6;
+  --reader-input: rgba(255, 255, 255, 0.1);
+  --reader-accent: #7f9a6d; /* sage-500 */
+}
+
+.reader .reader-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+.reader .reader-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.reader .reader-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* pdf.js text layer sits over the canvas for selection — keep it invisible
+   but selectable, and let rotation ride on the canvas transform. */
+.reader .reader-page {
+  transition: transform 0.18s var(--ease);
+}
+.reader .react-pdf__Page__textContent {
+  mix-blend-mode: normal;
+}
+
+/* ---------------------------------------------------------------------------
    Homepage landing — a self-contained skin that mirrors the SGSITS Notes Hub
    reference design (blue + ochre, near-white canvas, glass cards). Scoped to
    `.home` so it never leaks into the sage-toned app shell.

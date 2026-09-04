@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    // react-pdf / pdfjs-dist pulls an optional Node `canvas` binding we never
+    // use in the browser — stub it so webpack doesn't try to bundle it.
+    config.resolve.alias.canvas = false;
+    return config;
+  },
   async redirects() {
     return [
       // Dashboard → root (the new signed-in home)
