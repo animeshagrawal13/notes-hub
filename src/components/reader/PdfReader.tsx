@@ -33,6 +33,8 @@ import {
   X,
   ScanLine,
   MoveHorizontal,
+  Bookmark,
+  BookmarkCheck,
 } from 'lucide-react';
 import { PDF_OPTIONS } from './pdf-setup';
 import { cn } from '@/lib/cn';
@@ -50,12 +52,20 @@ type Props = {
   title: string;
   subtitle?: string;
   resourceId: string;
+  initiallyBookmarked?: boolean;
   onClose: () => void;
 };
 
 type Size = { width: number; height: number };
 
-export default function PdfReader({ fileUrl, title, subtitle, resourceId, onClose }: Props) {
+export default function PdfReader({
+  fileUrl,
+  title,
+  subtitle,
+  resourceId,
+  initiallyBookmarked = false,
+  onClose,
+}: Props) {
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const pageEls = useRef<Map<number, HTMLElement>>(new Map());
@@ -85,6 +95,8 @@ export default function PdfReader({ fileUrl, title, subtitle, resourceId, onClos
   const [gotoOpen, setGotoOpen] = useState(false);
   const [chromeVisible, setChromeVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [bookmarked, setBookmarked] = useState(initiallyBookmarked);
+  const [bookmarkPending, setBookmarkPending] = useState(false);
 
   const rotated90 = rotation % 180 !== 0;
   const file = useMemo(() => fileUrl, [fileUrl]);
@@ -305,6 +317,28 @@ export default function PdfReader({ fileUrl, title, subtitle, resourceId, onClos
     };
   }, [wake]);
 
+  // ── bookmark ──────────────────────────────────────────────────────────
+  const toggleBookmark = useCallback(async () => {
+    if (bookmarkPending) return;
+    const next = !bookmarked;
+    setBookmarked(next);
+    setBookmarkPending(true);
+    try {
+      const res = await fetch('/api/bookmarks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resourceId }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setBookmarked(!!data.bookmarked);
+    } catch {
+      setBookmarked(!next);
+    } finally {
+      setBookmarkPending(false);
+    }
+  }, [bookmarked, bookmarkPending, resourceId]);
+
   // ── fullscreen ──────────────────────────────────────────────────────
   const toggleFullscreen = useCallback(() => {
     const el = rootRef.current;
@@ -492,14 +526,30 @@ export default function PdfReader({ fileUrl, title, subtitle, resourceId, onClos
               </span>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close reader (Esc, or right-click the page)"
-            className="pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-[var(--reader-chrome)] text-[var(--reader-chrome-ink)] shadow-lg backdrop-blur-md transition hover:bg-[var(--reader-chrome-hover)]"
-          >
-            <X size={17} strokeWidth={2} />
-          </button>
+          <div className="pointer-events-auto flex items-center gap-2">
+            <button
+              type="button"
+              onClick={toggleBookmark}
+              aria-pressed={bookmarked}
+              aria-label={bookmarked ? 'Remove bookmark' : 'Save bookmark'}
+              className={cn(
+                'flex h-9 w-9 items-center justify-center rounded-full shadow-lg backdrop-blur-md transition',
+                bookmarked
+                  ? 'bg-[var(--reader-accent)] text-white'
+                  : 'bg-[var(--reader-chrome)] text-[var(--reader-chrome-ink)] hover:bg-[var(--reader-chrome-hover)]',
+              )}
+            >
+              {bookmarked ? <BookmarkCheck size={16} strokeWidth={2} /> : <Bookmark size={16} strokeWidth={2} />}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close reader (Esc, or right-click the page)"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--reader-chrome)] text-[var(--reader-chrome-ink)] shadow-lg backdrop-blur-md transition hover:bg-[var(--reader-chrome-hover)]"
+            >
+              <X size={17} strokeWidth={2} />
+            </button>
+          </div>
         </div>
 
         {error ? (

@@ -18,6 +18,7 @@ type Props = {
   title: string;
   subtitle?: string;
   canRenderPdf: boolean;
+  initiallyBookmarked?: boolean;
   /** where to go on close when there's no history to pop (direct load) */
   fallbackHref?: string;
 };
@@ -28,6 +29,7 @@ export default function ReaderOverlay({
   title,
   subtitle,
   canRenderPdf,
+  initiallyBookmarked = false,
   fallbackHref = '/notes',
 }: Props) {
   const router = useRouter();
@@ -81,6 +83,7 @@ export default function ReaderOverlay({
       resourceId={resourceId}
       title={title}
       subtitle={subtitle}
+      initiallyBookmarked={initiallyBookmarked}
       onClose={close}
     />
   );

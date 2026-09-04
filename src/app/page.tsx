@@ -8,7 +8,7 @@ import NoteListTable from '@/components/ui/NoteListTable';
 import EmptyState from '@/components/ui/EmptyState';
 import { LinkButton } from '@/components/ui/Button';
 import { auth } from '@/lib/auth';
-import { LibraryBig, FileText, Bookmark, Upload, CalendarDays, Search, ChevronRight } from 'lucide-react';
+import { LibraryBig, FileText, Bookmark, Upload, CalendarDays, Search, ChevronRight, ScrollText, Users, Clock } from 'lucide-react';
 import { daysUntil } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -97,21 +97,39 @@ export default async function HomePage() {
     );
   }
 
-  // ── Signed out — landing page (SGSITS Notes Hub reference design) ──────────
-  const [topSubjects, topNotes, allSubjects] = await Promise.all([
-    prisma.subject.findMany({
-      take: 8,
-      orderBy: { resources: { _count: 'desc' } },
-      include: { _count: { select: { resources: true } } },
-    }),
-    prisma.resource.findMany({
-      take: 6,
-      orderBy: { downloads: 'desc' },
-      where: { status: 'APPROVED' },
-      include: { subject: true },
-    }),
-    prisma.subject.findMany({ include: { semester: true }, orderBy: { name: 'asc' } }),
-  ]);
+  // ── Signed out — landing page ───────────────────────────────────────────
+  const [topSubjects, topNotes, recentNotes, allSubjects, subjectCount, resourceCount, pyqCount, studentCount] =
+    await Promise.all([
+      prisma.subject.findMany({
+        take: 8,
+        orderBy: { resources: { _count: 'desc' } },
+        include: { _count: { select: { resources: true } } },
+      }),
+      prisma.resource.findMany({
+        take: 6,
+        orderBy: { views: 'desc' },
+        where: { status: 'APPROVED' },
+        include: { subject: true },
+      }),
+      prisma.resource.findMany({
+        take: 6,
+        orderBy: { createdAt: 'desc' },
+        where: { status: 'APPROVED' },
+        include: { subject: true },
+      }),
+      prisma.subject.findMany({ include: { semester: true }, orderBy: { name: 'asc' } }),
+      prisma.subject.count(),
+      prisma.resource.count({ where: { status: 'APPROVED' } }),
+      prisma.resource.count({ where: { status: 'APPROVED', type: 'PYQ' } }),
+      prisma.user.count(),
+    ]);
+
+  const stats = [
+    { label: 'Subjects', value: subjectCount, Icon: LibraryBig, tint: 'sage' as const },
+    { label: 'Notes', value: resourceCount, Icon: FileText, tint: 'slate' as const },
+    { label: 'PYQ Papers', value: pyqCount, Icon: ScrollText, tint: 'ochre' as const },
+    { label: 'Students', value: studentCount, Icon: Users, tint: 'lavender' as const },
+  ];
 
   const firstYear = allSubjects.filter(s => s.semester?.year === 1);
   const sem1 = firstYear.filter(s => s.semester?.number === 1);
@@ -128,6 +146,24 @@ export default async function HomePage() {
     <div className="home space-y-16">
       {/* Hero */}
       <div className="home-hero-wrap">
+        <div className="home-botanical" aria-hidden>
+          <svg viewBox="0 0 900 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="120" cy="90" rx="180" ry="130" fill="var(--sage-200)" opacity="0.35" />
+            <ellipse cx="760" cy="60" rx="220" ry="150" fill="var(--sage-300)" opacity="0.25" />
+            <ellipse cx="820" cy="380" rx="200" ry="140" fill="var(--accent-cream)" opacity="0.4" />
+            <ellipse cx="60" cy="420" rx="170" ry="120" fill="var(--sage-100)" opacity="0.5" />
+            <path
+              d="M420 40 C470 90 470 150 420 200 C370 150 370 90 420 40 Z"
+              fill="var(--sage-300)"
+              opacity="0.22"
+            />
+            <path
+              d="M500 380 C555 420 555 470 500 500 C445 470 445 420 500 380 Z"
+              fill="var(--sage-400)"
+              opacity="0.18"
+            />
+          </svg>
+        </div>
         <div className="home-hero">
           <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
             <span className="home-badge home-badge-blue">Estd. 1952</span>
@@ -156,7 +192,34 @@ export default async function HomePage() {
               className="home-search"
             />
           </form>
+
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-2">
+            <Link href="/uploads" className="home-badge home-badge-blue transition hover:opacity-80">Upload notes</Link>
+            <Link href="/notes" className="home-badge home-badge-soft transition hover:opacity-80">Browse notes</Link>
+            <Link href="/pyq" className="home-badge home-badge-soft transition hover:opacity-80">Explore PYQs</Link>
+            <Link href="/subjects" className="home-badge home-badge-soft transition hover:opacity-80">All subjects</Link>
+          </div>
         </div>
+      </div>
+
+      {/* Quick stats */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.label} className="home-card flex items-center gap-3.5 p-4.5">
+            <span
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-input"
+              style={{ background: 'var(--h-primary-pale)', color: 'var(--h-primary)' }}
+            >
+              <s.Icon size={18} strokeWidth={1.8} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[22px] font-heading leading-none tracking-[-0.01em]" style={{ color: 'var(--h-ink)' }}>
+                {s.value}
+              </span>
+              <span className="mt-1 block truncate text-meta" style={{ color: 'var(--h-soft)' }}>{s.label}</span>
+            </span>
+          </div>
+        ))}
       </div>
 
       {/* Semester cards */}
@@ -203,6 +266,15 @@ export default async function HomePage() {
             <SubjectCard key={s.id} id={s.id} name={s.name} code={s.code || undefined} notes={s._count.resources} layout="grid" />
           ))}
         </div>
+      </div>
+
+      {/* Recently added */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Clock size={16} style={{ color: 'var(--h-primary)' }} />
+          <h2 className="home-section-title">Recently Added</h2>
+        </div>
+        <NoteListTable notes={recentNotes as any[]} />
       </div>
 
       {/* Trending notes */}

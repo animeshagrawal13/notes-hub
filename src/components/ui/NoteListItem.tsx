@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { relativeTime } from "@/lib/format";
 import { TypeBadge } from "./Badge";
+import BookmarkButton from "./BookmarkButton";
 
 export type NoteRowData = {
   id: string;
@@ -35,46 +36,66 @@ export function fileIcon(fileType?: string | null): LucideIcon {
 }
 
 /**
- * One note, one row. `variant="table"` is the §20 column layout (TITLE / TYPE /
- * UPLOADED BY / UPDATED) at 56px; `variant="row"` is the looser form the
- * dashboard and bookmarks use, with a caller-supplied right slot.
+ * One note, one row. `variant="table"` is the TITLE / TYPE / UPLOADED BY /
+ * UPDATED column layout; `variant="row"` is the looser card-list form. Pass
+ * `bookmarked` (a real boolean, not undefined) to render a live bookmark
+ * toggle instead of the caller-supplied `right` slot.
  */
 export default function NoteListItem({
   note,
   variant = "row",
   right,
+  bookmarked,
+  trailing,
+  middleColumn = "uploader",
   className,
 }: {
   note: NoteRowData;
   variant?: "row" | "table";
   right?: React.ReactNode;
+  bookmarked?: boolean;
+  /** table variant only — a custom slot (e.g. a status badge) after Updated */
+  trailing?: React.ReactNode;
+  /** table variant only — what the 150px column shows */
+  middleColumn?: "uploader" | "subject";
   className?: string;
 }) {
   const Icon = fileIcon(note.fileType);
-  const hover = "transition duration-calm ease-calm hover:bg-sage-50";
+  const hover =
+    "transition duration-calm ease-calm hover:bg-primary-soft hover:shadow-[inset_3px_0_0_0_var(--sage-400)]";
+
+  const iconBox = (
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-input bg-primary-soft text-primary-strong">
+      <Icon size={17} strokeWidth={1.8} />
+    </span>
+  );
 
   if (variant === "table") {
     return (
       <Link
         href={`/notes/${note.id}`}
-        className={cn("flex min-h-[56px] items-center gap-3 px-4 py-2.5", hover, className)}
+        className={cn("flex min-h-[64px] items-center gap-3.5 px-4 py-3", hover, className)}
       >
-        <Icon size={17} strokeWidth={1.8} className="shrink-0 text-muted" />
+        {iconBox}
         <span className="min-w-0 flex-1">
           <span className="block truncate text-body-lg font-semibold text-ink">{note.title}</span>
-          {note.subject && (
-            <span className="block truncate text-micro text-muted">{note.subject.name}</span>
+          {note.subject && middleColumn !== "subject" && (
+            <span className="mt-0.5 block truncate text-micro text-muted">{note.subject.name}</span>
           )}
         </span>
-        <span className="hidden w-[104px] shrink-0 sm:block">
+        <span className="hidden w-[112px] shrink-0 sm:block">
           <TypeBadge type={note.type} />
         </span>
         <span className="hidden w-[150px] shrink-0 truncate text-meta text-secondary lg:block">
-          {note.uploadedBy?.name ?? "—"}
+          {middleColumn === "subject" ? note.subject?.name ?? "—" : note.uploadedBy?.name ?? "—"}
         </span>
         <span className="w-[74px] shrink-0 text-right text-meta text-muted">
           {note.updatedAt ? relativeTime(note.updatedAt) : "—"}
         </span>
+        {trailing}
+        {bookmarked !== undefined && (
+          <BookmarkButton resourceId={note.id} initialBookmarked={bookmarked} className="shrink-0" />
+        )}
       </Link>
     );
   }
@@ -82,15 +103,9 @@ export default function NoteListItem({
   return (
     <Link
       href={`/notes/${note.id}`}
-      className={cn(
-        "flex items-center gap-3 rounded-input px-3 py-2.5",
-        hover,
-        className
-      )}
+      className={cn("flex items-center gap-3.5 rounded-input px-3.5 py-3", hover, className)}
     >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-button bg-sage-50 text-sage-700">
-        <Icon size={17} strokeWidth={1.8} />
-      </span>
+      {iconBox}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-body-lg font-semibold text-ink">{note.title}</span>
         <span className="mt-0.5 flex items-center gap-1.5 text-meta text-muted">
@@ -99,7 +114,11 @@ export default function NoteListItem({
           <span className="shrink-0">{note.updatedAt ? relativeTime(note.updatedAt) : "—"}</span>
         </span>
       </span>
-      {right && <span className="shrink-0 text-meta text-muted">{right}</span>}
+      {bookmarked !== undefined ? (
+        <BookmarkButton resourceId={note.id} initialBookmarked={bookmarked} className="shrink-0" />
+      ) : (
+        right && <span className="shrink-0 text-meta text-muted">{right}</span>
+      )}
     </Link>
   );
 }

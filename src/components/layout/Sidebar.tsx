@@ -1,32 +1,14 @@
-﻿'use client';
-// Fixed 240px sidebar per §5. Nav items are 42px tall with 9px radius.
-// Active: bg-sage-100 text-sage-800 font-semibold.
-// Bottom: 'Contribute notes' card + disclaimer line.
+'use client';
+// Mint Eucalyptus sidebar: leaf wordmark, grouped nav with a filled pill +
+// icon-chip active state, and a soft "contribute" card at the bottom.
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import {
-  GraduationCap, LayoutDashboard, BookOpen, FileText,
-  Bookmark, ScrollText, CalendarDays, Upload, Settings,
-  ShieldCheck, ChevronRight,
-} from 'lucide-react';
+import { Leaf, ShieldCheck, ChevronRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
-
-const NAV_ITEMS = [
-  { href: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/subjects', icon: BookOpen, label: 'Subjects' },
-  { href: '/notes', icon: FileText, label: 'Notes' },
-  { href: '/bookmarks', icon: Bookmark, label: 'Bookmarks' },
-  { href: '/pyq', icon: ScrollText, label: 'PYQ Papers' },
-] as const;
-
-const NAV_SECONDARY = [
-  { href: '/schedule', icon: CalendarDays, label: 'Schedule' },
-  { href: '/uploads', icon: Upload, label: 'My Uploads' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
-] as const;
+import { NAV_ITEMS, NAV_SECONDARY } from './nav-items';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -38,21 +20,31 @@ export default function Sidebar() {
     return pathname?.startsWith(href) ?? false;
   }
 
-  const item = (href: string, Icon: React.ElementType, label: string) => (
-    <Link
-      key={href}
-      href={href}
-      className={cn(
-        'flex h-nav items-center gap-[11px] rounded-button px-3 text-body-lg transition duration-calm ease-calm',
-        isActive(href)
-          ? 'bg-sage-100 text-sage-800 font-semibold'
-          : 'text-secondary hover:bg-sage-50 hover:text-ink'
-      )}
-    >
-      <Icon size={17} strokeWidth={1.8} className="shrink-0" />
-      {label}
-    </Link>
-  );
+  const item = (href: string, Icon: React.ElementType, label: string) => {
+    const active = isActive(href);
+    return (
+      <Link
+        key={href}
+        href={href}
+        className={cn(
+          'group flex h-nav items-center gap-2.5 rounded-button pl-2 pr-3 text-body-lg transition duration-calm ease-calm',
+          active
+            ? 'bg-primary-soft font-semibold text-primary-strong'
+            : 'text-secondary hover:bg-surface-soft hover:text-ink'
+        )}
+      >
+        <span
+          className={cn(
+            'flex h-7 w-7 shrink-0 items-center justify-center rounded-tiny transition duration-calm ease-calm',
+            active ? 'bg-surface text-sage-700 shadow-sm' : 'text-muted group-hover:text-sage-600'
+          )}
+        >
+          <Icon size={16} strokeWidth={1.9} className="shrink-0" />
+        </span>
+        {label}
+      </Link>
+    );
+  };
 
   return (
     <aside
@@ -63,43 +55,50 @@ export default function Sidebar() {
       )}
     >
       {/* Wordmark */}
-      <Link href="/" className="flex items-center gap-3 px-5 py-5 shrink-0">
-        <span className="flex h-9 w-9 items-center justify-center rounded-button bg-sage-100 text-sage-700">
-          <GraduationCap size={20} strokeWidth={1.8} />
+      <Link href="/" className="flex items-center gap-3 px-5 py-6 shrink-0">
+        <span className="flex h-10 w-10 items-center justify-center rounded-input bg-eucalyptus-fade text-white shadow-sm">
+          <Leaf size={19} strokeWidth={1.9} />
         </span>
         <span className="leading-tight">
-          <span className="block text-micro font-semibold uppercase tracking-widest text-muted">COLLEGE</span>
-          <span className="block text-[15px] font-bold tracking-tight text-ink">NOTES HUB</span>
+          <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">COLLEGE</span>
+          <span className="block text-[16px] font-heading tracking-tight text-ink">NOTES HUB</span>
         </span>
       </Link>
 
       {/* Primary nav */}
-      <nav className="flex-1 px-3 space-y-0.5">
-        {NAV_ITEMS.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
+      <nav className="flex-1 px-3">
+        <p className="px-2.5 pb-1.5 pt-1 text-micro font-semibold uppercase tracking-[0.12em] text-text-faint">Menu</p>
+        <div className="space-y-0.5">
+          {NAV_ITEMS.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
+        </div>
 
-        {/* Hairline divider */}
-        <div className="my-2 border-t border-border-light" />
+        <div className="my-4 border-t border-border-soft" />
 
-        {NAV_SECONDARY.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
-
-        {session?.user?.role === 'ADMIN' && item('/admin', ShieldCheck, 'Admin')}
+        <p className="px-2.5 pb-1.5 pt-1 text-micro font-semibold uppercase tracking-[0.12em] text-text-faint">More</p>
+        <div className="space-y-0.5">
+          {NAV_SECONDARY.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
+          {session?.user?.role === 'ADMIN' && item('/admin', ShieldCheck, 'Admin')}
+        </div>
       </nav>
 
       {/* Bottom card: contribute + disclaimer */}
       <div className="mx-3 mb-4 mt-2">
-        <div className="rounded-panel border border-sage-100 bg-sage-50 p-3.5">
-          <p className="text-body font-semibold text-sage-800 mb-1">Contribute notes</p>
-          <p className="text-micro text-sage-700 mb-2.5 leading-relaxed">
+        <div className="relative overflow-hidden rounded-panel border border-sage-100 bg-primary-soft p-4">
+          <span className="absolute -right-3 -top-3 flex h-14 w-14 items-center justify-center rounded-full bg-cream text-cream-ink opacity-70">
+            <Sparkles size={20} strokeWidth={1.6} />
+          </span>
+          <p className="relative text-body font-semibold text-primary-strong mb-1">Contribute notes</p>
+          <p className="relative text-micro text-sage-700 mb-3 leading-relaxed max-w-[85%]">
             Share your notes and help fellow students.
           </p>
           <Link
             href="/uploads"
-            className="flex items-center gap-1 text-micro font-semibold text-sage-700 hover:text-sage-800"
+            className="relative inline-flex items-center gap-1 rounded-button bg-surface px-3 py-1.5 text-micro font-semibold text-sage-700 shadow-sm transition duration-calm ease-calm hover:text-sage-800"
           >
             Upload notes <ChevronRight size={12} />
           </Link>
         </div>
-        <p className="mt-3 px-1 text-micro text-muted leading-relaxed">
+        <p className="mt-3 px-1 text-micro text-text-faint leading-relaxed">
           Unofficial student resource · not an official SGSITS portal
         </p>
       </div>

@@ -4,15 +4,24 @@
 
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
+import { auth } from '@/lib/auth';
 import ReaderOverlay from '@/components/reader/ReaderOverlay';
 
 export const dynamic = 'force-dynamic';
 
 export default async function NotePage({ params }: { params: { id: string } }) {
-  const resource = await prisma.resource.findUnique({
-    where: { id: params.id },
-    include: { subject: true, unit: true },
-  });
+  const session = await auth();
+  const [resource, existingBookmark] = await Promise.all([
+    prisma.resource.findUnique({
+      where: { id: params.id },
+      include: { subject: true, unit: true },
+    }),
+    session?.user
+      ? prisma.bookmark.findUnique({
+          where: { userId_resourceId: { userId: session.user.id, resourceId: params.id } },
+        })
+      : null,
+  ]);
   if (!resource) notFound();
 
   await prisma.resource.update({
@@ -31,6 +40,7 @@ export default async function NotePage({ params }: { params: { id: string } }) {
       title={resource.title}
       subtitle={subtitle || undefined}
       canRenderPdf={resource.fileUrl.toLowerCase().endsWith('.pdf')}
+      initiallyBookmarked={!!existingBookmark}
       fallbackHref="/notes"
     />
   );

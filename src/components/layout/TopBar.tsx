@@ -4,11 +4,17 @@ import { useSession } from 'next-auth/react';
 import { Search, Menu } from 'lucide-react';
 import { useEffect } from 'react';
 import UserMenu from './UserMenu';
+import ThemeToggle from './ThemeToggle';
 import { useShell } from './ShellContext';
 
 export default function TopBar() {
   const { data: session } = useSession();
-  const { toggleSidebar } = useShell();
+  const { toggleSidebar, toggleMobileDrawer } = useShell();
+
+  function handleMenuClick() {
+    if (window.matchMedia('(min-width: 768px)').matches) toggleSidebar();
+    else toggleMobileDrawer();
+  }
 
   // Expose global opener for Ctrl/Cmd+K
   useEffect(() => {
@@ -23,12 +29,12 @@ export default function TopBar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-surface px-8 md:px-10">
+    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-[color-mix(in_srgb,var(--surface)_90%,transparent)] backdrop-blur-sm px-6 md:px-9">
       <button
         type="button"
-        onClick={toggleSidebar}
-        className="hidden md:flex h-9 w-9 shrink-0 items-center justify-center rounded-button border border-border bg-background text-secondary transition duration-calm ease-calm hover:border-sage-300 hover:text-ink"
-        aria-label="Toggle sidebar"
+        onClick={handleMenuClick}
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-button border border-border bg-surface text-secondary transition duration-calm ease-calm hover:border-sage-300 hover:text-ink"
+        aria-label="Toggle menu"
       >
         <Menu size={17} strokeWidth={1.8} />
       </button>
@@ -36,15 +42,16 @@ export default function TopBar() {
       <button
         type="button"
         onClick={() => window.dispatchEvent(new CustomEvent('open-palette'))}
-        className="flex w-[360px] items-center gap-2 rounded-input border border-border bg-background px-3 py-2 text-body text-muted transition duration-calm ease-calm hover:border-sage-300 hover:bg-surface"
+        className="flex w-full max-w-[380px] items-center gap-2.5 rounded-full border border-border bg-background px-4 py-2.5 text-body text-muted shadow-sm transition duration-calm ease-calm hover:border-sage-300 hover:shadow-md"
         aria-label="Search notes (Ctrl+K)"
       >
         <Search size={15} strokeWidth={1.8} className="shrink-0" />
         <span className="flex-1 text-left">Search notes…</span>
-        <kbd className="hidden rounded border border-border px-1 py-0.5 text-micro sm:inline">⌘K</kbd>
+        <kbd className="hidden rounded-tiny border border-border bg-surface px-1.5 py-0.5 text-micro sm:inline">⌘K</kbd>
       </button>
 
       <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
         <UserMenu session={session} />
       </div>
     </header>

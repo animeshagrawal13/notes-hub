@@ -6,22 +6,24 @@ export type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: "bg-sage-600 text-white hover:bg-sage-700 border border-transparent",
-  secondary: "bg-elevated text-ink border border-border hover:border-sage-300 hover:bg-sage-50",
-  tertiary: "bg-transparent text-secondary border border-transparent hover:text-ink hover:bg-sage-50",
+  primary:
+    "bg-eucalyptus-fade text-white border border-transparent shadow-sm hover:shadow-md hover:-translate-y-px",
+  secondary:
+    "bg-surface text-ink border border-border shadow-sm hover:border-sage-300 hover:bg-primary-soft hover:-translate-y-px",
+  tertiary: "bg-transparent text-secondary border border-transparent hover:text-primary-strong hover:bg-primary-soft",
   danger: "bg-transparent border border-border text-[color:var(--danger)] hover:bg-[color:var(--tint-terracotta)]",
 };
 
 const SIZE: Record<ButtonSize, string> = {
-  sm: "h-[34px] px-3 text-meta gap-1.5",
-  md: "h-10 px-4 text-body gap-2",
-  lg: "h-[44px] px-5 text-body-lg gap-2",
+  sm: "h-[34px] px-3.5 text-meta gap-1.5",
+  md: "h-10 px-4.5 text-body gap-2",
+  lg: "h-[46px] px-6 text-body-lg gap-2",
 };
 
 export function buttonClasses(variant: ButtonVariant = "secondary", size: ButtonSize = "md", className?: string) {
   return cn(
     "inline-flex items-center justify-center rounded-button font-semibold whitespace-nowrap",
-    "transition duration-calm ease-calm active:translate-y-px disabled:opacity-60 disabled:pointer-events-none",
+    "transition duration-calm ease-calm active:translate-y-px disabled:opacity-60 disabled:pointer-events-none disabled:translate-y-0 disabled:shadow-none",
     VARIANT[variant],
     SIZE[size],
     className

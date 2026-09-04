@@ -32,7 +32,7 @@ export function NavPill() {
         mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2',
       )}
     >
-      <div className="flex items-center gap-0.5 rounded-full border border-border bg-surface/95 backdrop-blur-md px-1.5 py-1.5 shadow-pop">
+      <div className="flex items-center gap-0.5 rounded-full border border-border bg-[color-mix(in_srgb,var(--surface)_95%,transparent)] backdrop-blur-md px-1.5 py-1.5 shadow-pop">
         <button
           type="button"
           onClick={nav.back}
@@ -161,7 +161,7 @@ export function NavReminder() {
         visible ? (faded ? 'opacity-55' : 'opacity-100') : 'opacity-0 -translate-y-1',
       )}
     >
-      <div className="flex items-center gap-1.5 rounded-full border border-sage-200 bg-sage-50/90 backdrop-blur-sm px-3 py-1.5 text-micro font-medium text-sage-800 shadow-card">
+      <div className="flex items-center gap-1.5 rounded-full border border-sage-200 bg-[color-mix(in_srgb,var(--sage-50)_90%,transparent)] backdrop-blur-sm px-3 py-1.5 text-micro font-medium text-sage-800 shadow-card">
         {isTouch ? <Hand size={12} strokeWidth={2} /> : <MousePointerClick size={12} strokeWidth={2} />}
         {isTouch ? 'Swipe to navigate' : 'Right-click to go back'}
       </div>
@@ -194,7 +194,7 @@ export function NavIntro() {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[100] flex items-center justify-center bg-[color:var(--sage-800)]/35 backdrop-blur-[6px] p-5',
+        'fixed inset-0 z-[100] flex items-center justify-center bg-[color-mix(in_srgb,var(--sage-800)_35%,transparent)] backdrop-blur-[6px] p-5',
         'transition-opacity duration-400',
         stage >= 1 ? 'opacity-100' : 'opacity-0',
       )}

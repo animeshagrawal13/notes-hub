@@ -3,17 +3,19 @@ import NoteListItem, { type NoteRowData } from "./NoteListItem";
 import EmptyState from "./EmptyState";
 
 /**
- * The §20 notes table: a hairline-separated list inside the standard card
- * surface. Column widths live in NoteListItem so the header can never fall out
- * of step with the rows.
+ * The library table: a hairline-separated list on the standard card surface.
+ * Column widths live in NoteListItem so the header can never fall out of
+ * step with the rows. Pass `bookmarkedIds` to turn on live bookmark toggles.
  */
 export function NoteListTable({
   notes,
+  bookmarkedIds,
   emptyTitle = "No notes here yet",
   emptyBody,
   className,
 }: {
   notes: NoteRowData[];
+  bookmarkedIds?: Set<string>;
   emptyTitle?: string;
   emptyBody?: string;
   className?: string;
@@ -23,18 +25,23 @@ export function NoteListTable({
   }
 
   return (
-    <div className={cn("overflow-hidden rounded-card border border-border bg-surface shadow-card", className)}>
-      <div className="flex items-center gap-3 border-b border-border-light bg-elevated px-4 py-2.5 text-micro font-semibold uppercase tracking-[0.06em] text-muted">
-        <span className="w-[17px] shrink-0" aria-hidden />
+    <div className={cn("overflow-hidden rounded-md border border-border bg-surface shadow-sm", className)}>
+      <div className="flex items-center gap-3.5 border-b border-border-soft bg-surface-soft px-4 py-3 text-micro font-semibold uppercase tracking-[0.07em] text-text-faint">
+        <span className="w-10 shrink-0" aria-hidden />
         <span className="min-w-0 flex-1">Title</span>
-        <span className="hidden w-[104px] shrink-0 sm:block">Type</span>
+        <span className="hidden w-[112px] shrink-0 sm:block">Type</span>
         <span className="hidden w-[150px] shrink-0 lg:block">Uploaded by</span>
         <span className="w-[74px] shrink-0 text-right">Updated</span>
+        {bookmarkedIds && <span className="w-8 shrink-0" aria-hidden />}
       </div>
-      <ul className="divide-y divide-[color:var(--border-light)]">
+      <ul className="divide-y divide-border-soft">
         {notes.map((note) => (
           <li key={note.id}>
-            <NoteListItem note={note} variant="table" />
+            <NoteListItem
+              note={note}
+              variant="table"
+              bookmarked={bookmarkedIds ? bookmarkedIds.has(note.id) : undefined}
+            />
           </li>
         ))}
       </ul>
@@ -43,4 +50,3 @@ export function NoteListTable({
 }
 
 export default NoteListTable;
-

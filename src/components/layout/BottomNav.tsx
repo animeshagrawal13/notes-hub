@@ -1,19 +1,20 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, FileText, Bookmark, MoreHorizontal } from 'lucide-react';
+import { Home, BookOpen, FileText, Bookmark, Menu } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { useShell } from './ShellContext';
 
 const ITEMS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/subjects', icon: BookOpen, label: 'Subjects' },
   { href: '/notes', icon: FileText, label: 'Notes' },
   { href: '/bookmarks', icon: Bookmark, label: 'Saved' },
-  { href: '/uploads', icon: MoreHorizontal, label: 'More' },
 ] as const;
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { toggleMobileDrawer, mobileDrawerOpen } = useShell();
 
   return (
     <nav
@@ -36,6 +37,19 @@ export default function BottomNav() {
           </Link>
         );
       })}
+      <button
+        type="button"
+        onClick={toggleMobileDrawer}
+        aria-label="More"
+        aria-expanded={mobileDrawerOpen}
+        className={cn(
+          'flex flex-col items-center gap-1 px-4 py-1 text-micro transition duration-calm ease-calm',
+          mobileDrawerOpen ? 'text-sage-700 font-semibold' : 'text-muted'
+        )}
+      >
+        <Menu size={20} strokeWidth={mobileDrawerOpen ? 2 : 1.8} />
+        More
+      </button>
     </nav>
   );
 }

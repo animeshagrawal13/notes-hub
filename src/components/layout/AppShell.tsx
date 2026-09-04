@@ -9,6 +9,7 @@ import { ReactNode } from 'react';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
+import MobileDrawer from './MobileDrawer';
 import CommandPalette from './CommandPalette';
 import { ShellProvider, useShell } from './ShellContext';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -44,11 +45,12 @@ function ShellBody({ children }: { children: ReactNode }) {
         )}
       >
         <TopBar />
-        <main className="flex-1 px-8 py-8 md:px-10 md:py-10 max-w-shell w-full mx-auto">
+        <main className="flex-1 px-5 py-7 md:px-12 md:py-11 max-w-shell w-full mx-auto">
           {children}
         </main>
       </div>
       <BottomNav />
+      <MobileDrawer />
 
       {/* Site-wide gesture navigation chrome — right-click/arrows/swipe/side
           buttons drive real browser history (see NavContext); all paused
