@@ -12,6 +12,8 @@ import BottomNav from './BottomNav';
 import CommandPalette from './CommandPalette';
 import { ShellProvider, useShell } from './ShellContext';
 import { ToastProvider } from '@/components/ui/Toast';
+import { NavProvider } from '@/components/nav/NavContext';
+import { NavPill, NavFeedback, NavHelpPanel, NavReminder, NavIntro } from '@/components/nav/NavUI';
 import { cn } from '@/lib/cn';
 
 const NO_SHELL_PATHS = ['/login', '/register'];
@@ -30,7 +32,7 @@ function ShellBody({ children }: { children: ReactNode }) {
   }
 
   return (
-    <>
+    <NavProvider>
       <CommandPalette />
       {/* Sidebar — hidden on mobile, fixed on md+, slides out when collapsed */}
       <Sidebar />
@@ -47,7 +49,16 @@ function ShellBody({ children }: { children: ReactNode }) {
         </main>
       </div>
       <BottomNav />
-    </>
+
+      {/* Site-wide gesture navigation chrome — right-click/arrows/swipe/side
+          buttons drive real browser history (see NavContext); all paused
+          while the PDF reader is open. */}
+      <NavPill />
+      <NavFeedback />
+      <NavHelpPanel />
+      <NavReminder />
+      <NavIntro />
+    </NavProvider>
   );
 }
 

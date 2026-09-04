@@ -212,6 +212,64 @@ textarea:focus-visible {
 }
 
 /* ---------------------------------------------------------------------------
+   Site-wide gesture navigation (right-click / arrows / swipe) — small,
+   restrained motion cues. prefers-reduced-motion is already handled by the
+   global `*` rule above, which zeroes every animation/transition duration.
+   --------------------------------------------------------------------------- */
+@keyframes nav-feedback-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+.nav-feedback-pop {
+  animation: nav-feedback-pop 220ms var(--ease) both;
+}
+
+@keyframes nav-try-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(127, 154, 109, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(127, 154, 109, 0);
+  }
+}
+.nav-try-pulse {
+  animation: nav-try-pulse 1.8s ease-in-out 2;
+}
+
+@keyframes nav-glyph-arrow {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-3px);
+  }
+}
+.nav-glyph-arrow {
+  animation: nav-glyph-arrow 1.4s ease-in-out infinite;
+}
+
+@keyframes nav-glyph-swipe {
+  0%,
+  100% {
+    transform: translateX(6px);
+  }
+  50% {
+    transform: translateX(-6px);
+  }
+}
+.nav-glyph-swipe {
+  animation: nav-glyph-swipe 1.6s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------------------
    Homepage landing — a self-contained skin that mirrors the SGSITS Notes Hub
    reference design (blue + ochre, near-white canvas, glass cards). Scoped to
    `.home` so it never leaks into the sage-toned app shell.

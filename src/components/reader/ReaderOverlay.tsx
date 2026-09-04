@@ -42,8 +42,14 @@ export default function ReaderOverlay({
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    // Tell the site-wide gesture-navigation layer to stand down — the reader
+    // owns right-click/keyboard/swipe while it's open. A window event rather
+    // than context because this overlay can mount outside AppShell's tree
+    // (the intercepting @modal route is a sibling, not a child, of AppShell).
+    window.dispatchEvent(new CustomEvent('nh:reader-lock', { detail: { locked: true } }));
     return () => {
       document.body.style.overflow = prev;
+      window.dispatchEvent(new CustomEvent('nh:reader-lock', { detail: { locked: false } }));
     };
   }, []);
 
