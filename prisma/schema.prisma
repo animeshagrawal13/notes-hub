@@ -151,8 +151,60 @@ model Resource {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // ── Document-intelligence taxonomy (classification overhaul) ──────────────
+  // All nullable / defaulted so this is a non-destructive addition. `type` is
+  // kept as-is during migration; `documentType` (a canonical id from
+  // src/lib/taxonomy.ts) supersedes it once VERIFIED.
+  originalFilename String? // basename before any rename, for rollback
+  suggestedTitle   String? // human-readable title proposed by the classifier
+  fileHash         String? // sha256 of file bytes — duplicate detection
+  pageCount        Int?
+  contentText      String? // extracted + OCR text, lower-cased — powers search
+
+  academicArea String? // canonical id: mathematics | physics | chemistry | ...
+  documentType String? // canonical id: previous_year_question_paper | class_notes | ...
+  examType     String? // MST1 | MST2 | END_SEM | SUPPLEMENTARY | UNKNOWN
+  examSession  String? // free text, e.g. "Apr 2025"
+  academicYear Int?
+  courseCode   String?
+  branch       String?
+  topicsJson   String? // JSON string[] — SQLite has no array columns
+  tagsJson     String? // JSON string[] — structured replacement for `tags`
+
+  // Workflow: UNCLASSIFIED -> AUTO_CLASSIFIED | REVIEW_REQUIRED -> VERIFIED
+  classificationStatus     String  @default("UNCLASSIFIED")
+  classificationConfidence Float?
+  classificationReason     String?
+  needsReview              Boolean @default(false)
+  possibleDuplicate        Boolean @default(false)
+  duplicateOfId            String?
+
+  classificationLogs ClassificationLog[]
+
   @@index([subjectId])
   @@index([status])
+  @@index([documentType])
+  @@index([classificationStatus])
+  @@index([fileHash])
+}
+
+// Append-only audit trail for every automated or human classification change.
+// Each row carries JSON before/after snapshots so the whole migration is
+// reversible by replaying logs in reverse.
+model ClassificationLog {
+  id         String   @id @default(cuid())
+  resourceId String
+  resource   Resource @relation(fields: [resourceId], references: [id])
+  action     String // BACKFILL | AUTO_CLASSIFY | REVIEW_APPROVE | REVIEW_EDIT | RENAME | ROLLBACK
+  actor      String   @default("system") // "system" or a user id / email
+  before     String? // JSON snapshot of the affected fields
+  after      String? // JSON snapshot of the affected fields
+  confidence Float?
+  reason     String?
+  createdAt  DateTime @default(now())
+
+  @@index([resourceId])
+  @@index([action])
 }
 
 model Bookmark {
