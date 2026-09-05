@@ -4,7 +4,6 @@
 // src/app/notes/[id]/page.tsx instead.
 
 import { prisma } from '@/lib/prisma';
-import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import ReaderOverlay from '@/components/reader/ReaderOverlay';
 import { readerKindFor } from '@/components/reader/reader-kind';
@@ -24,7 +23,11 @@ export default async function InterceptedNoteReader({ params }: { params: { id: 
         })
       : null,
   ]);
-  if (!resource) notFound();
+  // No match means [id] caught something that isn't a resource id — a static
+  // sibling like /notes/review, or a dead link. Render nothing and let the
+  // main slot decide (the real page, or its own 404); calling notFound() here
+  // would 404 the whole route even when the page underneath is perfectly fine.
+  if (!resource) return null;
 
   prisma.resource
     .update({ where: { id: resource.id }, data: { views: { increment: 1 } } })

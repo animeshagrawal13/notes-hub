@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Leaf, ShieldCheck, X, LogOut } from 'lucide-react';
+import { Leaf, ShieldCheck, X, LogOut, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
 import { NAV_ITEMS, NAV_SECONDARY } from './nav-items';
@@ -32,6 +32,9 @@ export default function MobileDrawer() {
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/';
+    // /admin has a child nav entry (/admin/review) — match it exactly so both
+    // rows don't light up at once.
+    if (href === '/admin') return pathname === '/admin';
     return pathname?.startsWith(href) ?? false;
   }
 
@@ -100,6 +103,7 @@ export default function MobileDrawer() {
           <div className="my-3 border-t border-border-soft" />
           <div className="space-y-0.5">
             {NAV_SECONDARY.map(({ href, icon, label }) => item(href, icon, label))}
+            {session?.user?.role === 'ADMIN' && item('/admin/review', ListChecks, 'Review queue')}
             {session?.user?.role === 'ADMIN' && item('/admin', ShieldCheck, 'Admin')}
           </div>
         </nav>

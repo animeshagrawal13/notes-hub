@@ -49,8 +49,12 @@ def log_id() -> str:
     return "clg" + secrets.token_hex(12)
 
 
-def now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+def now() -> int:
+    # Prisma stores SQLite DateTime as epoch milliseconds. Writing an ISO
+    # string here "works" (Prisma parses it back) but makes the column mixed
+    # type, and SQLite sorts every integer before every string — so an
+    # ORDER BY createdAt would put the newest rows last.
+    return int(datetime.now(timezone.utc).timestamp() * 1000)
 
 
 def local_path(file_url: str) -> str:

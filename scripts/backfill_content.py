@@ -170,7 +170,8 @@ def main() -> None:
                 json.dumps(before),
                 json.dumps(after),
                 f"extracted via {ex.get('source')}",
-                datetime.now(timezone.utc).isoformat(),
+                # epoch ms — Prisma's SQLite DateTime encoding (see classify_apply.now)
+                int(datetime.now(timezone.utc).timestamp() * 1000),
             ),
         )
         con.commit()

@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Leaf, ShieldCheck, ChevronRight, Sparkles } from 'lucide-react';
+import { Leaf, ShieldCheck, ChevronRight, Sparkles, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
 import { NAV_ITEMS, NAV_SECONDARY } from './nav-items';
@@ -17,6 +17,9 @@ export default function Sidebar() {
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/';
+    // /admin has a child nav entry (/admin/review) — match it exactly so both
+    // rows don't light up at once.
+    if (href === '/admin') return pathname === '/admin';
     return pathname?.startsWith(href) ?? false;
   }
 
@@ -77,6 +80,7 @@ export default function Sidebar() {
         <p className="px-2.5 pb-1.5 pt-1 text-micro font-semibold uppercase tracking-[0.12em] text-text-faint">More</p>
         <div className="space-y-0.5">
           {NAV_SECONDARY.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
+          {session?.user?.role === 'ADMIN' && item('/admin/review', ListChecks, 'Review queue')}
           {session?.user?.role === 'ADMIN' && item('/admin', ShieldCheck, 'Admin')}
         </div>
       </nav>
