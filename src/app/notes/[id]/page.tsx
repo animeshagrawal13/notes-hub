@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import ReaderOverlay from '@/components/reader/ReaderOverlay';
+import { readerKindFor } from '@/components/reader/reader-kind';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,7 @@ export default async function NotePage({ params }: { params: { id: string } }) {
       resourceId={resource.id}
       title={resource.title}
       subtitle={subtitle || undefined}
-      canRenderPdf={resource.fileUrl.toLowerCase().endsWith('.pdf')}
+      kind={readerKindFor(resource.fileUrl)}
       initiallyBookmarked={!!existingBookmark}
       fallbackHref="/notes"
     />

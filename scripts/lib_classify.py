@@ -10,6 +10,7 @@ No DB or filesystem access here. `classify_dry_run.py` wires this to the data.
 
 from __future__ import annotations
 
+import os
 import re
 import unicodedata
 from dataclasses import dataclass, field, asdict
@@ -496,5 +497,8 @@ def _suggest_names(p: Proposal, subj: Subject | None) -> tuple[str | None, str |
     if qualifier:
         parts.append(qualifier)
     title = " — ".join(parts)
-    fname = kebab("-".join([subj.code] + parts[1:])) + ".pdf"
+    # Keep the real extension — a renamed .pptx/.docx must not become a fake
+    # ".pdf" (it would then get routed to the wrong reader / fail to open).
+    ext = os.path.splitext(p.original_filename or "")[1].lower() or ".pdf"
+    fname = kebab("-".join([subj.code] + parts[1:])) + ext
     return title, fname

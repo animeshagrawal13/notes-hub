@@ -266,6 +266,15 @@ html.force-reduced-motion *::after {
   mix-blend-mode: normal;
 }
 
+/* pptx-preview ships its own prev/next circles baked into the slide DOM —
+   PptxReader drives navigation itself via the floating pill, so hide the
+   library's built-in controls to avoid two competing nav UIs. */
+.reader .pptx-preview-wrapper-next,
+.reader .pptx-preview-wrapper-prev,
+.reader .pptx-preview-wrapper-pagination {
+  display: none !important;
+}
+
 /* ---------------------------------------------------------------------------
    Site-wide gesture navigation (right-click / arrows / swipe) — small,
    restrained motion cues. prefers-reduced-motion is already handled by the
