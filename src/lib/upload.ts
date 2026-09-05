@@ -13,10 +13,15 @@ const ALLOWED_TYPES = new Set([
 const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 // New uploads (made after launch) are written here, separate from the
-// build-time seed content in public/uploads. In production this should
+// build-time seed content in private-uploads/. In production this should
 // point at a mounted persistent volume (e.g. /data/uploads on Railway) so
 // files survive redeploys; it defaults to a local folder for dev.
 export const RUNTIME_UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(process.cwd(), "runtime-uploads");
+
+// The seeded library. Deliberately OUTSIDE public/ so Next never serves it
+// as a static asset — everything goes through /api/files, which is the one
+// place access control and no-store headers can be enforced.
+export const SEED_UPLOAD_DIR = path.join(process.cwd(), "private-uploads");
 
 export class UploadValidationError extends Error {}
 

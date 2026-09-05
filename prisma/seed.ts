@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 
 const prisma = new PrismaClient();
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+const UPLOADS_DIR = path.join(process.cwd(), "private-uploads");
 
 const FILE_TYPE_BY_EXT: Record<string, string> = {
   ".pdf": "PDF",
@@ -788,7 +788,7 @@ async function main() {
 
       const title = cleanTitle(category, filename);
       const type = inferResourceType(filename);
-      const fileUrl = `/uploads/${category}/${filename}`;
+      const fileUrl = `/api/files/${category}/${filename}`;
       const description = `${title} — study material for ${def.name} (First Year, common to all branches).`;
 
       const existing = await prisma.resource.findFirst({ where: { fileUrl } });

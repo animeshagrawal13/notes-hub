@@ -20,8 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
+  // suppressHydrationWarning on <html>: the inline theme script below sets
+  // data-theme / a class before React hydrates, which React would otherwise
+  // flag as a server/client attribute mismatch.
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         {/* Apply a stored dark-mode preference before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

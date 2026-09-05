@@ -10,12 +10,15 @@ import EmptyState from "./EmptyState";
 export function NoteListTable({
   notes,
   bookmarkedIds,
+  snippets,
   emptyTitle = "No notes here yet",
   emptyBody,
   className,
 }: {
   notes: NoteRowData[];
   bookmarkedIds?: Set<string>;
+  /** resourceId -> matched text excerpt, shown under the title on search */
+  snippets?: Record<string, string>;
   emptyTitle?: string;
   emptyBody?: string;
   className?: string;
@@ -41,6 +44,7 @@ export function NoteListTable({
               note={note}
               variant="table"
               bookmarked={bookmarkedIds ? bookmarkedIds.has(note.id) : undefined}
+              snippet={snippets?.[note.id]}
             />
           </li>
         ))}

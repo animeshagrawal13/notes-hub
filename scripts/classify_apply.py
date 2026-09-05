@@ -4,7 +4,7 @@ PHASE C/D — apply the dry-run proposals.
 Order of operations (all reversible via ClassificationLog + a DB backup):
   1. ARCHIVE_DUPLICATE  — exact-byte duplicates: keep the earliest row, set
      the rest to status='ARCHIVED' (drops out of every APPROVED listing),
-     move their file into public/uploads/_archived-duplicates/.
+     move their file into private-uploads/_archived-duplicates/.
   2. AUTO_CLASSIFY      — the 49 high-confidence rows: write taxonomy fields,
      rename the file on disk, update fileUrl.
   3. STAGE_REVIEW       — the rest: write academicArea + documentType + a
@@ -36,9 +36,10 @@ except Exception:
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB = os.path.join(ROOT, "prisma", "dev.db")
-PUBLIC = os.path.join(ROOT, "public")
+# fileUrl is now "/api/files/<category>/<name>", resolved under private-uploads/
+PRIVATE_UPLOADS = os.path.join(ROOT, "private-uploads")
 PROPOSALS = os.path.join(ROOT, "data", "migration-proposals.json")
-ARCHIVE_DIR = os.path.join(PUBLIC, "uploads", "_archived-duplicates")
+ARCHIVE_DIR = os.path.join(PRIVATE_UPLOADS, "_archived-duplicates")
 
 DRY = "--dry" in sys.argv
 ROLLBACK = "--rollback" in sys.argv
@@ -53,7 +54,7 @@ def now() -> str:
 
 
 def local_path(file_url: str) -> str:
-    return os.path.join(PUBLIC, file_url.lstrip("/").replace("/", os.sep))
+    return os.path.join(PRIVATE_UPLOADS, file_url.replace("/api/files/", "").replace("/", os.sep))
 
 
 def write_log(con, resource_id, action, before, after, confidence=None, reason=None):
@@ -141,9 +142,9 @@ def main():
         r = rows[rid]
         old_url = r["fileUrl"]
         new_url = None
-        if old_url.startswith("/uploads/") and os.path.exists(local_path(old_url)):
+        if old_url.startswith("/api/files/") and os.path.exists(local_path(old_url)):
             newname = f"{rid}__{os.path.basename(old_url)}"
-            new_url = f"/uploads/_archived-duplicates/{newname}"
+            new_url = f"/api/files/_archived-duplicates/{newname}"
         before = {
             "status": r["status"], "possibleDuplicate": r["possibleDuplicate"],
             "duplicateOfId": r["duplicateOfId"], "fileUrl": old_url,
@@ -208,7 +209,7 @@ def main():
             fields["classificationStatus"] = "AUTO_CLASSIFIED"
             fields["needsReview"] = 0
             auto_n += 1
-            if p["suggested_filename"] and r["fileUrl"].startswith("/uploads/"):
+            if p["suggested_filename"] and r["fileUrl"].startswith("/api/files/"):
                 folder = os.path.dirname(local_path(r["fileUrl"]))
                 fname = unique_path(folder, p["suggested_filename"])
                 new_url = f"{os.path.dirname(r['fileUrl'])}/{fname}"

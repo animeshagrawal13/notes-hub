@@ -7,6 +7,7 @@ import NoteListItem from '@/components/ui/NoteListItem';
 import EmptyState from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/Badge';
 import { Upload } from 'lucide-react';
+import UploadRowActions from '@/components/UploadRowActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +40,7 @@ export default async function UploadsPage() {
               <span className="hidden w-[150px] shrink-0 lg:block">Subject</span>
               <span className="w-[74px] shrink-0 text-right">Added</span>
               <span className="w-[92px] shrink-0 text-right">Status</span>
+              <span className="w-8 shrink-0" aria-hidden />
             </div>
             <ul className="divide-y divide-border-soft">
               {uploads.map((u) => (
@@ -48,9 +50,12 @@ export default async function UploadsPage() {
                     variant="table"
                     middleColumn="subject"
                     trailing={
-                      <span className="hidden w-[92px] shrink-0 text-right lg:block">
-                        <StatusBadge status={u.status} />
-                      </span>
+                      <>
+                        <span className="hidden w-[92px] shrink-0 text-right lg:block">
+                          <StatusBadge status={u.status} />
+                        </span>
+                        <UploadRowActions resourceId={u.id} title={u.title} />
+                      </>
                     }
                   />
                 </li>

@@ -47,6 +47,7 @@ export default function NoteListItem({
   right,
   bookmarked,
   trailing,
+  snippet,
   middleColumn = "uploader",
   className,
 }: {
@@ -54,6 +55,8 @@ export default function NoteListItem({
   variant?: "row" | "table";
   right?: React.ReactNode;
   bookmarked?: boolean;
+  /** matched text from inside the document, shown on search results */
+  snippet?: string;
   /** table variant only — a custom slot (e.g. a status badge) after Updated */
   trailing?: React.ReactNode;
   /** table variant only — what the 150px column shows */
@@ -82,6 +85,9 @@ export default function NoteListItem({
           {note.subject && middleColumn !== "subject" && (
             <span className="mt-0.5 block truncate text-micro text-muted">{note.subject.name}</span>
           )}
+          {snippet && (
+            <span className="mt-1 block truncate text-micro italic text-text-faint">{snippet}</span>
+          )}
         </span>
         <span className="hidden w-[112px] shrink-0 sm:block">
           <TypeBadge type={note.type} />
@@ -89,7 +95,10 @@ export default function NoteListItem({
         <span className="hidden w-[150px] shrink-0 truncate text-meta text-secondary lg:block">
           {middleColumn === "subject" ? note.subject?.name ?? "—" : note.uploadedBy?.name ?? "—"}
         </span>
-        <span className="w-[74px] shrink-0 text-right text-meta text-muted">
+        {/* relativeTime is computed from Date.now(), so the server and the
+            client can straddle a minute boundary and disagree — that would
+            otherwise blow away the whole hydrated tree. */}
+        <span className="w-[74px] shrink-0 text-right text-meta text-muted" suppressHydrationWarning>
           {note.updatedAt ? relativeTime(note.updatedAt) : "—"}
         </span>
         {trailing}
@@ -111,7 +120,9 @@ export default function NoteListItem({
         <span className="mt-0.5 flex items-center gap-1.5 text-meta text-muted">
           {note.subject && <span className="truncate">{note.subject.name}</span>}
           {note.subject && <span aria-hidden>·</span>}
-          <span className="shrink-0">{note.updatedAt ? relativeTime(note.updatedAt) : "—"}</span>
+          <span className="shrink-0" suppressHydrationWarning>
+            {note.updatedAt ? relativeTime(note.updatedAt) : "—"}
+          </span>
         </span>
       </span>
       {bookmarked !== undefined ? (

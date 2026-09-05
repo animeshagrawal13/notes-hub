@@ -1,10 +1,15 @@
 import { prisma } from '@/lib/prisma';
 import PageHeader from '@/components/ui/PageHeader';
 import AdminPanel from '@/components/AdminPanel';
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPage() {
+  const session = await auth();
+  if (session?.user?.role !== 'ADMIN') redirect('/');
+
   const [
     totalUsers,
     totalResources,

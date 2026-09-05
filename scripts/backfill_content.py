@@ -36,7 +36,8 @@ from lib_extract import extract_any  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(ROOT, "prisma", "dev.db")
-PUBLIC = os.path.join(ROOT, "public")
+# fileUrl is now "/api/files/<category>/<name>", resolved under private-uploads/
+PRIVATE_UPLOADS = os.path.join(ROOT, "private-uploads")
 CACHE_PATH = os.path.join(ROOT, "data", "extract-cache.json")
 MAX_TEXT_CHARS = 20000  # bounds contentText in the DB; full text stays in the cache
 
@@ -68,7 +69,7 @@ def save_cache(cache: dict) -> None:
 def local_path(file_url: str) -> str | None:
     if file_url.startswith("http://") or file_url.startswith("https://"):
         return None
-    return os.path.join(PUBLIC, file_url.lstrip("/").replace("/", os.sep))
+    return os.path.join(PRIVATE_UPLOADS, file_url.replace("/api/files/", "").replace("/", os.sep))
 
 
 def show_stats(con: sqlite3.Connection) -> None:

@@ -52,7 +52,7 @@ BAD_NAME_RE = re.compile(
 
 
 def folder_of(file_url: str) -> str:
-    m = re.match(r"/uploads/([^/]+)/", file_url)
+    m = re.match(r"/api/files/([^/]+)/", file_url)
     return m.group(1) if m else ""
 
 
