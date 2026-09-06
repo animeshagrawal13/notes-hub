@@ -5,7 +5,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Leaf, ShieldCheck, ChevronRight, Sparkles, ListChecks } from 'lucide-react';
+import { ShieldCheck, ChevronRight, Sparkles, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
 import { NAV_ITEMS, NAV_SECONDARY, NAV_ACCOUNT } from './nav-items';
@@ -59,12 +59,10 @@ export default function Sidebar() {
     >
       {/* Wordmark */}
       <Link href="/" className="flex items-center gap-3 px-5 py-6 shrink-0">
-        <span className="flex h-10 w-10 items-center justify-center rounded-input bg-eucalyptus-fade text-white shadow-sm">
-          <Leaf size={19} strokeWidth={1.9} />
-        </span>
+        <img src="/sgsits-logo.webp" alt="SGSITS crest" className="h-10 w-10 shrink-0 rounded-full object-cover shadow-sm" />
         <span className="leading-tight">
-          <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">COLLEGE</span>
-          <span className="block text-[16px] font-heading tracking-tight text-ink">NOTES HUB</span>
+          <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">SGSITS</span>
+          <span className="block text-[16px] font-heading tracking-tight text-ink">NoteVault</span>
         </span>
       </Link>
 

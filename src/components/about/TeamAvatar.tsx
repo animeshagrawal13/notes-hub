@@ -35,7 +35,7 @@ export default function TeamAvatar({ slug, name }: { slug: string; name: string 
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={src}
-          alt={`${name}, co-creator of Notes Hub`}
+          alt={`${name}, co-creator of SGSITS NoteVault`}
           width={120}
           height={120}
           className="h-full w-full object-cover"

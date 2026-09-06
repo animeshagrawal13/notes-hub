@@ -672,8 +672,8 @@ async function main() {
   // name (the "Your name" field on /uploads) and show up individually.
   const contributor = await prisma.user.upsert({
     where: { email: "contributor@collegenoteshub.dev" },
-    update: { name: "Notes Hub Team" },
-    create: { name: "Notes Hub Team", email: "contributor@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
+    update: { name: "NoteVault Team" },
+    create: { name: "NoteVault Team", email: "contributor@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
   });
 
   await prisma.user.upsert({

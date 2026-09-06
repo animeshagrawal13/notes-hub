@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const caveat = Caveat({ subsets: ["latin"], weight: ["400", "600"], variable: "--font-hand" });
 
 export const metadata: Metadata = {
-  title: "College Notes Hub | SGSITS B.Tech First Year",
+  title: "SGSITS NoteVault | B.Tech First Year",
   description:
     "Unit-wise notes, official syllabus, class slides and previous year questions for every first-year subject — Semester I & II.",
 };

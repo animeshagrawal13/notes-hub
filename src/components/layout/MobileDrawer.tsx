@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import { Leaf, ShieldCheck, X, LogOut, ListChecks } from 'lucide-react';
+import { ShieldCheck, X, LogOut, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
 import { NAV_ITEMS, NAV_SECONDARY, NAV_ACCOUNT } from './nav-items';
@@ -81,12 +81,10 @@ export default function MobileDrawer() {
       >
         <div className="flex items-center justify-between px-5 py-5">
           <Link href="/" onClick={closeMobileDrawer} className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-input bg-eucalyptus-fade text-white shadow-sm">
-              <Leaf size={17} strokeWidth={1.9} />
-            </span>
+            <img src="/sgsits-logo.webp" alt="SGSITS crest" className="h-9 w-9 shrink-0 rounded-full object-cover shadow-sm" />
             <span className="leading-tight">
-              <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">College</span>
-              <span className="block text-[15px] font-heading text-ink">Notes Hub</span>
+              <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">SGSITS</span>
+              <span className="block text-[15px] font-heading text-ink">NoteVault</span>
             </span>
           </Link>
           <button

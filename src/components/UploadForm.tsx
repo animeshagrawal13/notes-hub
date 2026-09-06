@@ -36,7 +36,7 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
             required
           />
           <p className="mt-1.5 text-micro text-muted">
-            Notes Hub has no accounts — the name you enter here is shown publicly as the
+            SGSITS NoteVault has no accounts — the name you enter here is shown publicly as the
             uploader on anything you submit.
           </p>
         </div>

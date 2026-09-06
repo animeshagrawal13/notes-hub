@@ -87,7 +87,7 @@ export default async function HomePage() {
 
         <div className="relative max-w-xl">
           <p className="text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">
-            College Notes Hub
+            SGSITS NoteVault
           </p>
           <h1 className="mt-2.5 text-[clamp(1.9rem,4vw,2.6rem)] font-heading leading-[1.12] tracking-[-0.02em] text-ink">
             Welcome
@@ -180,7 +180,7 @@ export default async function HomePage() {
             A little progress every day adds up to big results.
           </p>
           <p className="relative mt-4 max-w-[30ch] text-body leading-relaxed text-sage-700">
-            Notes Hub is built and maintained by students, for students.
+            SGSITS NoteVault is built and maintained by students, for students.
           </p>
           <Link
             href="/about"

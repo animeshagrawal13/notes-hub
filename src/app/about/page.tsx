@@ -3,9 +3,9 @@ import { BookOpen, Users, Leaf } from 'lucide-react';
 import TeamAvatar from '@/components/about/TeamAvatar';
 
 export const metadata: Metadata = {
-  title: 'About · College Notes Hub',
+  title: 'About · SGSITS NoteVault',
   description:
-    'Notes Hub is a student-made platform bringing college notes, PYQs and learning resources into one place — no accounts, no unnecessary barriers.',
+    'SGSITS NoteVault is a student-made platform bringing college notes, PYQs and learning resources into one place — no accounts, no unnecessary barriers.',
 };
 
 const REASONS = [
@@ -59,7 +59,7 @@ export default function AboutPage() {
           </h1>
           <span aria-hidden className="mt-6 block h-[3px] w-24 rounded-full bg-sage-300" />
           <p className="mt-6 max-w-md text-body-lg leading-relaxed text-secondary">
-            Notes Hub is a student-made platform to bring all college notes, PYQs and learning
+            SGSITS NoteVault is a student-made platform to bring all college notes, PYQs and learning
             resources into one place. No accounts, no unnecessary barriers — just open access for
             everyone.
           </p>
@@ -138,7 +138,7 @@ export default function AboutPage() {
               id="team-heading"
               className="mt-3 text-[clamp(1.5rem,3.4vw,2.05rem)] font-heading font-bold leading-tight tracking-[-0.02em] text-ink"
             >
-              The people behind Notes Hub.
+              The people behind SGSITS NoteVault.
             </h2>
           </div>
 
