@@ -1,7 +1,8 @@
 'use client';
 // Fixed sidebar (240px) + fluid main column on md+, collapsible via the ☰
 // button in TopBar (state in ShellContext, persisted to localStorage).
-// For /login and /register renders children centered with no sidebar.
+// /login (contributor + admin sign-in, not linked from the public site)
+// renders children centered with no sidebar.
 // Mounts ToastProvider and CommandPalette once globally.
 
 import { usePathname } from 'next/navigation';
@@ -17,7 +18,7 @@ import { NavProvider } from '@/components/nav/NavContext';
 import { NavPill, NavFeedback, NavHelpPanel, NavReminder, NavIntro } from '@/components/nav/NavUI';
 import { cn } from '@/lib/cn';
 
-const NO_SHELL_PATHS = ['/login', '/register'];
+const NO_SHELL_PATHS = ['/login'];
 
 function ShellBody({ children }: { children: ReactNode }) {
   const pathname = usePathname();

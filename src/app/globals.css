@@ -515,3 +515,12 @@ html.force-reduced-motion *::after {
 .home-foot a:hover {
   color: var(--h-primary);
 }
+
+/* ---------------------------------------------------------------------------
+   Handwritten accent — /about only. Deliberately not a design token: it is an
+   annotation voice, never body copy or a heading.
+   --------------------------------------------------------------------------- */
+.font-hand {
+  font-family: var(--font-hand), "Segoe Script", "Bradley Hand", cursive;
+  letter-spacing: 0.01em;
+}

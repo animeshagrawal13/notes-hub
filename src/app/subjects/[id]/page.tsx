@@ -1,14 +1,12 @@
 import { prisma } from '@/lib/prisma';
 import PageHeader from '@/components/ui/PageHeader';
 import SubjectTabs from '@/components/SubjectTabs';
-import { auth } from '@/lib/auth';
 import { getBookmarkedIds } from '@/lib/bookmarks';
 import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SubjectDetailPage({ params }: { params: { id: string } }) {
-  const session = await auth();
   const [subject, bookmarkedIds] = await Promise.all([
     prisma.subject.findUnique({
       where: { id: params.id },
@@ -17,7 +15,7 @@ export default async function SubjectDetailPage({ params }: { params: { id: stri
         resources: { where: { status: 'APPROVED' }, include: { uploadedBy: true }, orderBy: { createdAt: 'desc' } },
       },
     }),
-    getBookmarkedIds(session?.user?.id),
+    getBookmarkedIds(),
   ]);
 
   if (!subject) notFound();

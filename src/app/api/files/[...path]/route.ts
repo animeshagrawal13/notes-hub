@@ -11,10 +11,18 @@ import { RUNTIME_UPLOAD_DIR, SEED_UPLOAD_DIR } from "@/lib/upload";
  * any more, so this route is the single choke point for access control and
  * for the headers that discourage casual saving.
  *
- * Flip REQUIRE_SIGN_IN to false to let signed-out visitors read documents
- * again (they can still browse titles/metadata either way).
+ * Notes Hub is a public site — no accounts, no login wall — so documents are
+ * readable by anyone. The anti-saving posture is unchanged and does not
+ * depend on this flag: files are still served only through this route (never
+ * from public/), always `inline` and never as an attachment, with no-store
+ * caching, nosniff, and noindex so they don't get archived or crawled.
+ *
+ * Set REQUIRE_SIGN_IN back to true to restrict reading to signed-in users.
+ * Note that a public site means a determined visitor can fetch the raw bytes
+ * from the URL — the headers below discourage casual saving, they cannot
+ * prevent it.
  */
-const REQUIRE_SIGN_IN = true;
+const REQUIRE_SIGN_IN = false;
 
 const CONTENT_TYPES: Record<string, string> = {
   ".pdf": "application/pdf",

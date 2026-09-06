@@ -42,7 +42,6 @@ export default async function NotePage({ params }: { params: { id: string } }) {
       subtitle={subtitle || undefined}
       kind={readerKindFor(resource.fileUrl)}
       initiallyBookmarked={!!existingBookmark}
-      signedIn={!!session?.user}
       fallbackHref="/notes"
     />
   );

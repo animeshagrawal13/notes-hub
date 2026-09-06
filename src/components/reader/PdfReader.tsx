@@ -39,6 +39,7 @@ import {
 import { PDF_OPTIONS } from './pdf-setup';
 import { cn } from '@/lib/cn';
 import { loadPosition, savePosition, type FitMode } from './reader-state';
+import { useBookmarks } from '@/lib/use-bookmarks';
 
 const IDLE_MS = 2600;
 const GUTTER = 48; // px of breathing room around a page at fit-width
@@ -95,8 +96,14 @@ export default function PdfReader({
   const [gotoOpen, setGotoOpen] = useState(false);
   const [chromeVisible, setChromeVisible] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const { ids: bookmarkIds, ready: bookmarksReady, toggle: toggleLocalBookmark } = useBookmarks();
   const [bookmarked, setBookmarked] = useState(initiallyBookmarked);
-  const [bookmarkPending, setBookmarkPending] = useState(false);
+
+  // The saved list only exists in the browser, so it can't be known until
+  // after mount — adopt it as soon as it's read.
+  useEffect(() => {
+    if (bookmarksReady) setBookmarked(bookmarkIds.includes(resourceId));
+  }, [bookmarksReady, bookmarkIds, resourceId]);
 
   const rotated90 = rotation % 180 !== 0;
   const file = useMemo(() => fileUrl, [fileUrl]);
@@ -317,27 +324,10 @@ export default function PdfReader({
     };
   }, [wake]);
 
-  // ── bookmark ──────────────────────────────────────────────────────────
-  const toggleBookmark = useCallback(async () => {
-    if (bookmarkPending) return;
-    const next = !bookmarked;
-    setBookmarked(next);
-    setBookmarkPending(true);
-    try {
-      const res = await fetch('/api/bookmarks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resourceId }),
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setBookmarked(!!data.bookmarked);
-    } catch {
-      setBookmarked(!next);
-    } finally {
-      setBookmarkPending(false);
-    }
-  }, [bookmarked, bookmarkPending, resourceId]);
+  // ── bookmark (saved in this browser — no account, see lib/use-bookmarks) ──
+  const toggleBookmark = useCallback(() => {
+    setBookmarked(toggleLocalBookmark(resourceId));
+  }, [toggleLocalBookmark, resourceId]);
 
   // ── fullscreen ──────────────────────────────────────────────────────
   const toggleFullscreen = useCallback(() => {

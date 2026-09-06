@@ -69,7 +69,11 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-meta text-secondary">
-          Don&rsquo;t have an account? <Link href="/register" className="font-semibold text-sage-600 hover:underline">Register here</Link>
+          Browsing Notes Hub doesn&rsquo;t need an account —{' '}
+          <Link href="/" className="font-semibold text-sage-600 hover:underline">
+            go to the notes
+          </Link>
+          .
         </p>
       </Card>
     </div>

@@ -1,25 +1,16 @@
-import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
-import { prisma } from '@/lib/prisma';
 import PageHeader from '@/components/ui/PageHeader';
-import BookmarksList from '@/components/BookmarksList';
+import LocalBookmarks from '@/components/LocalBookmarks';
 
-export const dynamic = 'force-dynamic';
+export const metadata = {
+  title: 'Saved notes',
+  description: 'Notes you have saved in this browser.',
+};
 
-export default async function BookmarksPage() {
-  const session = await auth();
-  if (!session?.user) redirect('/login');
-
-  const bookmarks = await prisma.bookmark.findMany({
-    where: { userId: session.user.id },
-    include: { resource: { include: { subject: true, uploadedBy: true } } },
-    orderBy: { createdAt: 'desc' }
-  });
-
+export default function BookmarksPage() {
   return (
     <div className="space-y-6">
-      <PageHeader title="Bookmarks" subtitle="Your saved notes" />
-      <BookmarksList bookmarks={bookmarks as any[]} />
+      <PageHeader title="Saved" subtitle="Notes you've saved in this browser" />
+      <LocalBookmarks />
     </div>
   );
 }

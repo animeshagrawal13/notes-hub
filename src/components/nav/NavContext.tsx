@@ -64,6 +64,7 @@ const STATIC_LABELS: Record<string, string> = {
   '/schedule': 'Schedule',
   '/uploads': 'My Uploads',
   '/settings': 'Settings',
+  '/about': 'About',
   '/admin/review': 'Review queue',
   '/admin': 'Admin',
   '/browse': 'Browse',

@@ -8,7 +8,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { X } from 'lucide-react';
 // Server Components (the route files rendering this) must import
 // readerKindFor from './reader-kind' directly, not from here — a named
@@ -26,8 +25,6 @@ type Props = {
   subtitle?: string;
   kind: ReaderKind;
   initiallyBookmarked?: boolean;
-  /** documents are served from a signed-in-only route */
-  signedIn?: boolean;
   /** where to go on close when there's no history to pop (direct load) */
   fallbackHref?: string;
 };
@@ -39,7 +36,6 @@ export default function ReaderOverlay({
   subtitle,
   kind,
   initiallyBookmarked = false,
-  signedIn = true,
   fallbackHref = '/notes',
 }: Props) {
   const router = useRouter();
@@ -53,7 +49,7 @@ export default function ReaderOverlay({
 
   // PdfReader/PptxReader own their own Esc handling (help panels, fullscreen,
   // ...); only the plain image/unsupported views need one wired here.
-  const needsOwnEscHandler = kind === 'image' || kind === 'unsupported' || !signedIn;
+  const needsOwnEscHandler = kind === 'image' || kind === 'unsupported';
   useEffect(() => {
     if (!needsOwnEscHandler) return;
     const onKey = (e: KeyboardEvent) => {
@@ -77,38 +73,6 @@ export default function ReaderOverlay({
       window.dispatchEvent(new CustomEvent('nh:reader-lock', { detail: { locked: false } }));
     };
   }, []);
-
-  // Documents are served only to signed-in users (see /api/files), so say so
-  // plainly instead of letting the viewer fail with a generic load error.
-  if (!signedIn) {
-    return (
-      <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-6" onClick={close}>
-        <div
-          className="w-full max-w-sm rounded-2xl border border-border bg-surface p-6 text-center shadow-pop"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <h2 className="text-card-title font-semibold text-ink">Sign in to read this</h2>
-          <p className="mt-2 text-body text-secondary">
-            {title} is available to signed-in students.
-          </p>
-          <div className="mt-4 flex justify-center gap-2">
-            <Link
-              href="/login"
-              className="inline-flex items-center rounded-button bg-eucalyptus-fade px-4 py-2 text-body font-semibold text-white shadow-sm"
-            >
-              Sign in
-            </Link>
-            <button
-              onClick={close}
-              className="inline-flex items-center gap-1.5 rounded-button border border-border px-4 py-2 text-body font-semibold text-ink hover:bg-sage-50"
-            >
-              <X size={15} /> Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (kind === 'unsupported') {
     const isLegacyPpt = fileUrl.toLowerCase().endsWith('.ppt');

@@ -1,6 +1,5 @@
 import PageHeader from '@/components/ui/PageHeader';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
 import { getBookmarkedIds } from '@/lib/bookmarks';
 import NoteListTable from '@/components/ui/NoteListTable';
 import EmptyState from '@/components/ui/EmptyState';
@@ -16,7 +15,6 @@ export default async function NotesPage({
   searchParams: { q?: string; type?: string; year?: string; sort?: string };
 }) {
   const { q, type, year, sort } = searchParams;
-  const session = await auth();
 
   const where: Prisma.ResourceWhereInput = { status: 'APPROVED', ...searchWhere(q ?? '') };
   if (type && type !== 'all') where.type = type;
@@ -41,7 +39,7 @@ export default async function NotesPage({
       },
       orderBy: sort === 'popular' ? { views: 'desc' } : { createdAt: 'desc' },
     }),
-    getBookmarkedIds(session?.user?.id),
+    getBookmarkedIds(),
     prisma.resource.findMany({
       where: { academicYear: { not: null } },
       distinct: ['academicYear'],

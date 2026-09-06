@@ -45,7 +45,6 @@ export default async function InterceptedNoteReader({ params }: { params: { id: 
       subtitle={subtitle || undefined}
       kind={readerKindFor(resource.fileUrl)}
       initiallyBookmarked={!!existingBookmark}
-      signedIn={!!session?.user}
     />
   );
 }

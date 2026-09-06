@@ -9,7 +9,7 @@ import BookmarkButton from '@/components/ui/BookmarkButton';
 import EmptyState from '@/components/ui/EmptyState';
 import { cn } from '@/lib/cn';
 
-export default function PYQBrowser({ pyqs, bookmarkedIds }: { pyqs: any[]; bookmarkedIds?: Set<string> }) {
+export default function PYQBrowser({ pyqs }: { pyqs: any[] }) {
   const subjects = Array.from(new Set(pyqs.map((p) => p.subject.name))).sort();
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(new Set());
 
@@ -75,10 +75,7 @@ export default function PYQBrowser({ pyqs, bookmarkedIds }: { pyqs: any[]; bookm
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input bg-primary-soft text-primary-strong">
                       <FileText size={16} strokeWidth={1.8} />
                     </span>
-                    <BookmarkButton
-                      resourceId={p.id}
-                      initialBookmarked={bookmarkedIds ? bookmarkedIds.has(p.id) : false}
-                    />
+                    <BookmarkButton resourceId={p.id} />
                   </div>
                   <Link href={`/notes/${p.id}`} className="flex-1">
                     <p className="text-meta font-semibold text-sage-700">{p.subject.name}</p>

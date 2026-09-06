@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 import { Leaf, ShieldCheck, ChevronRight, Sparkles, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
-import { NAV_ITEMS, NAV_SECONDARY } from './nav-items';
+import { NAV_ITEMS, NAV_SECONDARY, NAV_ACCOUNT } from './nav-items';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -80,6 +80,7 @@ export default function Sidebar() {
         <p className="px-2.5 pb-1.5 pt-1 text-micro font-semibold uppercase tracking-[0.12em] text-text-faint">More</p>
         <div className="space-y-0.5">
           {NAV_SECONDARY.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
+          {session?.user && NAV_ACCOUNT.map(({ href, icon: Icon, label }) => item(href, Icon, label))}
           {session?.user?.role === 'ADMIN' && item('/admin/review', ListChecks, 'Review queue')}
           {session?.user?.role === 'ADMIN' && item('/admin', ShieldCheck, 'Admin')}
         </div>

@@ -9,7 +9,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { Leaf, ShieldCheck, X, LogOut, ListChecks } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { useShell } from './ShellContext';
-import { NAV_ITEMS, NAV_SECONDARY } from './nav-items';
+import { NAV_ITEMS, NAV_SECONDARY, NAV_ACCOUNT } from './nav-items';
 
 export default function MobileDrawer() {
   const { mobileDrawerOpen, closeMobileDrawer } = useShell();
@@ -103,29 +103,24 @@ export default function MobileDrawer() {
           <div className="my-3 border-t border-border-soft" />
           <div className="space-y-0.5">
             {NAV_SECONDARY.map(({ href, icon, label }) => item(href, icon, label))}
+            {session?.user && NAV_ACCOUNT.map(({ href, icon, label }) => item(href, icon, label))}
             {session?.user?.role === 'ADMIN' && item('/admin/review', ListChecks, 'Review queue')}
             {session?.user?.role === 'ADMIN' && item('/admin', ShieldCheck, 'Admin')}
           </div>
         </nav>
 
-        <div className="border-t border-border-soft px-3 py-4">
-          {session?.user ? (
+        {/* No sign-in prompt: the site is open to everyone. Contributors who
+            do have a session get a way back out. */}
+        {session?.user && (
+          <div className="border-t border-border-soft px-3 py-4">
             <button
               onClick={() => signOut()}
               className="flex h-11 w-full items-center gap-3 rounded-button px-3 text-body-lg text-secondary hover:bg-surface-soft"
             >
               <LogOut size={18} strokeWidth={1.9} /> Sign out
             </button>
-          ) : (
-            <Link
-              href="/login"
-              onClick={closeMobileDrawer}
-              className="flex h-11 w-full items-center justify-center rounded-button bg-eucalyptus-fade text-body-lg font-semibold text-white shadow-sm"
-            >
-              Sign in
-            </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

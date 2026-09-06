@@ -103,7 +103,7 @@ export default function NoteListItem({
         </span>
         {trailing}
         {bookmarked !== undefined && (
-          <BookmarkButton resourceId={note.id} initialBookmarked={bookmarked} className="shrink-0" />
+          <BookmarkButton resourceId={note.id} className="shrink-0" />
         )}
       </Link>
     );
@@ -126,7 +126,7 @@ export default function NoteListItem({
         </span>
       </span>
       {bookmarked !== undefined ? (
-        <BookmarkButton resourceId={note.id} initialBookmarked={bookmarked} className="shrink-0" />
+        <BookmarkButton resourceId={note.id} className="shrink-0" />
       ) : (
         right && <span className="shrink-0 text-meta text-muted">{right}</span>
       )}

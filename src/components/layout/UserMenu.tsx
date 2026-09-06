@@ -17,16 +17,9 @@ export default function UserMenu({ session }: { session: Session | null }) {
     return () => document.removeEventListener('mousedown', handle);
   }, []);
 
-  if (!session) {
-    return (
-      <Link
-        href="/login"
-        className="inline-flex h-9 items-center rounded-button bg-sage-600 px-4 text-body font-semibold text-white transition duration-calm ease-calm hover:bg-sage-700"
-      >
-        Sign In
-      </Link>
-    );
-  }
+  // Notes Hub is public — a visitor with no session is the normal case, not a
+  // state to prompt out of, so there is nothing to render here for them.
+  if (!session) return null;
 
   const initials = (session.user?.name ?? 'U')
     .split(' ')
