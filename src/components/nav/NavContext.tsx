@@ -68,7 +68,6 @@ const STATIC_LABELS: Record<string, string> = {
   '/admin/review': 'Review queue',
   '/admin': 'Admin',
   '/browse': 'Browse',
-  '/profile': 'Profile',
 };
 
 function routeLabel(pathname: string): string {

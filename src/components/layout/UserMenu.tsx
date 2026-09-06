@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { User, Upload, Settings, LogOut } from 'lucide-react';
+import { Upload, Settings, LogOut } from 'lucide-react';
 import type { Session } from 'next-auth';
 
 export default function UserMenu({ session }: { session: Session | null }) {
@@ -47,7 +47,6 @@ export default function UserMenu({ session }: { session: Session | null }) {
           </div>
           <nav className="p-1.5 space-y-0.5">
             {([
-              { href: '/profile', icon: User, label: 'Profile' },
               { href: '/uploads', icon: Upload, label: 'My Uploads' },
               { href: '/settings', icon: Settings, label: 'Settings' },
             ] as const).map(({ href, icon: Icon, label }) => (
@@ -55,7 +54,7 @@ export default function UserMenu({ session }: { session: Session | null }) {
                 key={href}
                 href={href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 rounded-button px-3 py-2 text-body text-secondary transition duration-calm ease-calm hover:bg-sage-50 hover:text-ink"
+                className="flex items-center gap-2.5 rounded-button px-3 py-2 text-body text-secondary transition duration-calm ease-calm hover:bg-row-hover hover:text-ink"
               >
                 <Icon size={15} strokeWidth={1.8} className="shrink-0" />
                 {label}
@@ -64,7 +63,7 @@ export default function UserMenu({ session }: { session: Session | null }) {
             <div className="my-1 border-t border-border-light" />
             <button
               onClick={() => { setOpen(false); signOut({ callbackUrl: '/' }); }}
-              className="flex w-full items-center gap-2.5 rounded-button px-3 py-2 text-body text-secondary transition duration-calm ease-calm hover:bg-sage-50 hover:text-ink"
+              className="flex w-full items-center gap-2.5 rounded-button px-3 py-2 text-body text-secondary transition duration-calm ease-calm hover:bg-row-hover hover:text-ink"
             >
               <LogOut size={15} strokeWidth={1.8} className="shrink-0" />
               Log out

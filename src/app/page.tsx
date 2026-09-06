@@ -7,7 +7,7 @@ import NoteListTable from '@/components/ui/NoteListTable';
 import { getBookmarkedIds } from '@/lib/bookmarks';
 import {
   LibraryBig, FileText, ScrollText, Layers, BookOpen,
-  Building2, Clock, Flame,
+  Building2, Clock, Flame, ArrowRight,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -152,29 +152,42 @@ export default async function HomePage() {
           />
         </div>
 
-        <aside className="relative min-w-0 overflow-hidden rounded-md border border-sage-100 bg-primary-soft p-6">
+        <aside className="relative flex min-w-0 flex-col overflow-hidden rounded-md border border-sage-100 bg-primary-soft p-7 sm:p-9">
           <svg
-            viewBox="0 0 120 120"
+            viewBox="0 0 200 240"
             aria-hidden
-            className="pointer-events-none absolute -bottom-4 -right-3 h-32 w-32 opacity-70"
+            className="pointer-events-none absolute -bottom-10 -right-8 h-56 w-56"
           >
-            <path d="M60 14 C92 40 92 84 60 108 C28 84 28 40 60 14 Z" fill="var(--sage-300)" opacity="0.5" />
-            <path d="M60 20 L60 104" stroke="var(--sage-500)" strokeWidth="2" opacity="0.5" />
+            {/* smaller leaf tucked behind, lower-left */}
+            <path
+              d="M72 232 C34 206 30 146 62 104 C94 146 100 194 72 232 Z"
+              fill="var(--sage-300)"
+              opacity="0.32"
+            />
+            {/* main upright leaf */}
+            <path
+              d="M138 6 C178 74 178 162 138 230 C98 162 98 74 138 6 Z"
+              fill="var(--sage-300)"
+              opacity="0.45"
+            />
+            <path d="M138 16 L138 220" stroke="var(--sage-500)" strokeWidth="2" opacity="0.45" />
           </svg>
-          <p className="relative text-[26px] leading-none text-sage-600" aria-hidden>
+
+          <p className="relative font-heading text-[2.75rem] font-bold leading-[0.7] text-sage-500" aria-hidden>
             &ldquo;
           </p>
-          <p className="relative mt-1 text-body-lg font-semibold leading-relaxed text-primary-strong">
+          <p className="relative mt-5 text-[clamp(1.35rem,2vw,1.9rem)] font-heading font-bold leading-[1.15] tracking-[-0.02em] text-primary-strong">
             A little progress every day adds up to big results.
           </p>
-          <p className="relative mt-4 max-w-[85%] text-meta leading-relaxed text-sage-700">
+          <p className="relative mt-4 max-w-[30ch] text-body leading-relaxed text-sage-700">
             Notes Hub is built and maintained by students, for students.
           </p>
           <Link
             href="/about"
-            className="relative mt-4 inline-flex items-center gap-1 rounded-button bg-surface px-3 py-1.5 text-micro font-semibold text-sage-700 shadow-sm transition duration-calm ease-calm hover:text-sage-800"
+            className="relative mt-7 inline-flex items-center gap-2 self-start rounded-button bg-surface px-4 py-2.5 text-meta font-semibold text-primary-strong shadow-sm transition duration-calm ease-calm hover:shadow-md"
           >
             About the project
+            <ArrowRight size={15} strokeWidth={2.4} />
           </Link>
         </aside>
       </section>
