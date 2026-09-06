@@ -2,7 +2,6 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import StatCard from '@/components/ui/StatCard';
-import { LinkButton } from '@/components/ui/Button';
 import ProfileTabs from '@/components/ProfileTabs';
 import { Upload, Eye, Star, Bookmark } from 'lucide-react';
 
@@ -30,7 +29,6 @@ export default async function ProfilePage() {
           <h1 className="text-page font-heading text-ink">{session.user.name}</h1>
           <p className="text-meta text-secondary">{session.user.email} · Joined {new Date().getFullYear()}</p>
         </div>
-        <LinkButton href="/settings" variant="secondary">Edit Profile</LinkButton>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

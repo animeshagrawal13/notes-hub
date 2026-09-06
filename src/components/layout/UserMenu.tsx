@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { Upload, Settings, LogOut } from 'lucide-react';
+import { Upload, LogOut } from 'lucide-react';
 import type { Session } from 'next-auth';
 
 export default function UserMenu({ session }: { session: Session | null }) {
@@ -48,7 +48,6 @@ export default function UserMenu({ session }: { session: Session | null }) {
           <nav className="p-1.5 space-y-0.5">
             {([
               { href: '/uploads', icon: Upload, label: 'My Uploads' },
-              { href: '/settings', icon: Settings, label: 'Settings' },
             ] as const).map(({ href, icon: Icon, label }) => (
               <Link
                 key={href}

@@ -63,7 +63,6 @@ const STATIC_LABELS: Record<string, string> = {
   '/pyq': 'PYQ Papers',
   '/schedule': 'Schedule',
   '/uploads': 'My Uploads',
-  '/settings': 'Settings',
   '/about': 'About',
   '/admin/review': 'Review queue',
   '/admin': 'Admin',

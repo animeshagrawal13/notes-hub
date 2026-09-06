@@ -666,10 +666,14 @@ async function main() {
   });
 
   const studentPassword = await bcrypt.hash("Student@123", 10);
+  // Every seeded resource is attributed to this account. It is not a real
+  // person — the library was assembled by the project team — so it carries a
+  // team label. Real contributors who upload through the site get their own
+  // name (the "Your name" field on /uploads) and show up individually.
   const contributor = await prisma.user.upsert({
     where: { email: "contributor@collegenoteshub.dev" },
-    update: {},
-    create: { name: "Ananya Sharma", email: "contributor@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
+    update: { name: "Notes Hub Team" },
+    create: { name: "Notes Hub Team", email: "contributor@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
   });
 
   await prisma.user.upsert({

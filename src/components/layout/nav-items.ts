@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, BookOpen, FileText,
-  Bookmark, ScrollText, CalendarDays, Upload, Settings, Info,
+  Bookmark, ScrollText, CalendarDays, Upload, Info,
 } from 'lucide-react';
 
 // Shared between the desktop Sidebar and the mobile drawer so the two menus
@@ -26,5 +26,4 @@ export const NAV_SECONDARY = [
 /** Only rendered for a signed-in contributor/admin — these need an identity. */
 export const NAV_ACCOUNT = [
   { href: '/uploads', icon: Upload, label: 'My Uploads' },
-  { href: '/settings', icon: Settings, label: 'Settings' },
 ] as const;
