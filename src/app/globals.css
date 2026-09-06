@@ -54,6 +54,12 @@
   --tint-lavender-ink: #6b5f86;
   --tint-sage: #e3f1e7;
   --tint-sage-ink: #3b6350;
+
+  /* Hover fill for rows and menu items whose text is the neutral ink/muted
+     scale (note tables, the user menu, dropdowns, the command palette). Kept
+     as its own token because --tint-sage / --sage-50 are paired with dark
+     green ink elsewhere and must stay light even in dark mode. */
+  --row-hover: #e3f1e7;
   --tint-terracotta: #f3e7de;
   --tint-terracotta-ink: #8f5e45;
   --tint-ochre: #f2ebd9;
@@ -94,6 +100,9 @@
 
   --border: #24392e;
   --border-light: #1e3226;
+
+  /* a quiet lift above --surface, not the light mint the light theme uses */
+  --row-hover: #21382c;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.4), 0 16px 32px rgba(0, 0, 0, 0.35);

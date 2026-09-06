@@ -41,6 +41,7 @@ const config: Config = {
         primary: "var(--sage-500)",
         "primary-soft": "var(--tint-sage)",
         "primary-strong": "var(--sage-800)",
+        "row-hover": "var(--row-hover)",
         text: "var(--text-primary)",
         "text-muted": "var(--text-muted)",
         "text-faint": "var(--text-faint)",

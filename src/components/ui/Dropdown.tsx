@@ -58,8 +58,8 @@ export function DropdownItem({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex w-full items-center px-3.5 py-2 text-body text-secondary transition duration-calm ease-calm hover:bg-sage-50 hover:text-ink',
-        active && 'bg-sage-50 font-semibold text-ink'
+        'flex w-full items-center px-3.5 py-2 text-body text-secondary transition duration-calm ease-calm hover:bg-row-hover hover:text-ink',
+        active && 'bg-row-hover font-semibold text-ink'
       )}
     >
       {children}

@@ -96,7 +96,7 @@ export default function CommandPalette() {
               <button
                 key={h.id}
                 onClick={() => { setOpen(false); router.push(`/notes/${h.id}`); }}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition duration-calm ease-calm hover:bg-sage-50"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition duration-calm ease-calm hover:bg-row-hover"
               >
                 <FileText size={15} strokeWidth={1.8} className="shrink-0 text-muted" />
                 <span className="min-w-0 flex-1">

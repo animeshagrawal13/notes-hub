@@ -65,7 +65,7 @@ export default function NoteListItem({
 }) {
   const Icon = fileIcon(note.fileType);
   const hover =
-    "transition duration-calm ease-calm hover:bg-primary-soft hover:shadow-[inset_3px_0_0_0_var(--sage-400)]";
+    "transition duration-calm ease-calm hover:bg-row-hover hover:shadow-[inset_3px_0_0_0_var(--sage-400)]";
 
   const iconBox = (
     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-input bg-primary-soft text-primary-strong">
