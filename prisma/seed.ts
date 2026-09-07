@@ -847,6 +847,16 @@ async function main() {
       { title: "End-Semester Exams begin (Theory + Practical)", date: new Date("2026-11-30"), kind: "EXAM" },
       { title: "SAMARPAN '26", date: new Date("2026-12-20"), kind: "REMINDER" },
       { title: "Semester Break begins", date: new Date("2026-12-20"), kind: "REMINDER" },
+      // Official list of holidays (in each month), from the same calendar.
+      { title: "Holiday", date: new Date("2026-08-26"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-08-28"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-09-04"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-09-14"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-10-02"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-10-20"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-10-26"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-11-09"), kind: "REMINDER" },
+      { title: "Holiday", date: new Date("2026-11-24"), kind: "REMINDER" },
     ],
   });
   console.log("Study events seeded from the official Sem A 2026-27 academic calendar.");

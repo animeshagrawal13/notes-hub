@@ -102,29 +102,44 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
         <IconButton icon={<ChevronRight size={16} />} onClick={nextMonth} label="Next month" />
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
-          <div key={d} className="py-2 text-center text-meta font-semibold text-text-faint">{d}</div>
-        ))}
-        {blanks.map((b) => (
-          <div key={`blank-${b}`} />
-        ))}
-        {days.map((d) => {
-          const hasEvent = monthEvents.some((e) => new Date(e.date).getDate() === d);
-          return (
-            <div
-              key={d}
-              className={cn(
-                'flex aspect-square items-center justify-center rounded-input text-body',
-                hasEvent
-                  ? 'bg-primary-soft font-bold text-primary-strong ring-1 ring-inset ring-sage-300'
-                  : 'border border-border-soft bg-surface text-secondary',
-              )}
-            >
-              {d}
+      <div className="overflow-hidden rounded-md border border-border shadow-sm">
+        <div className="grid grid-cols-7 border-b border-border bg-surface-soft">
+          {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((d) => (
+            <div key={d} className="py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-text-faint">
+              <span className="sm:hidden">{d.slice(0, 3)}</span>
+              <span className="hidden sm:inline">{d}</span>
             </div>
-          );
-        })}
+          ))}
+        </div>
+        <div className="grid grid-cols-7 [&>div]:border-r [&>div]:border-b [&>div:nth-child(7n)]:border-r-0 border-border">
+          {blanks.map((b) => (
+            <div key={`blank-${b}`} className="min-h-[64px] bg-surface-soft/40 sm:min-h-[92px]" />
+          ))}
+          {days.map((d) => {
+            const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d);
+            const dow = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+            const dayEvents = monthEvents.filter((e) => new Date(e.date).getDate() === d);
+            const primary = dayEvents[0];
+            const isWeekend = dow === 0 || dow === 6;
+            const weekendLabel = dow === 0 ? 'Sunday' : dow === 6 ? 'Saturday' : null;
+
+            const tint = primary ? KIND_STYLE[primary.kind] ?? KIND_STYLE.REMINDER : isWeekend ? 'bg-surface-soft text-text-faint' : 'bg-surface';
+
+            return (
+              <div key={d} className={cn('min-h-[64px] p-1.5 sm:min-h-[92px] sm:p-2', tint)}>
+                <div className="text-right text-[11px] font-semibold sm:text-body">{d}</div>
+                {(primary || weekendLabel) && (
+                  <div className="mt-1 truncate text-left text-[10px] font-medium leading-tight sm:text-meta" title={primary?.title ?? weekendLabel ?? undefined}>
+                    {primary ? primary.title : weekendLabel}
+                  </div>
+                )}
+                {dayEvents.length > 1 && (
+                  <div className="text-left text-[10px] text-text-faint">+{dayEvents.length - 1} more</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="space-y-3.5 pt-2">
