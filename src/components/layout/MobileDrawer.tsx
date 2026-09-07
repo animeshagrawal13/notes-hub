@@ -84,7 +84,7 @@ export default function MobileDrawer() {
             <img src="/sgsits-logo.webp" alt="SGSITS crest" className="h-9 w-9 shrink-0 rounded-full object-cover shadow-sm" />
             <span className="leading-tight">
               <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">SGSITS</span>
-              <span className="block text-[15px] font-heading text-ink">NoteVault</span>
+              <span className="block text-[15px] font-heading text-ink">NotesVault</span>
             </span>
           </Link>
           <button

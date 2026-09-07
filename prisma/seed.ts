@@ -159,7 +159,6 @@ const SUBJECTS: Record<string, SubjectDef> = {
       { number: 5, title: "Machining & Fitting Practice" },
     ],
   },
-  GN00001: { code: "GN00001", name: "First-Year Miscellaneous Resources", credits: "", semesterNumber: 1, units: [] },
 };
 
 // Each upload category's default subject.
@@ -172,7 +171,11 @@ const CATEGORY_DEFAULT_SUBJECT: Record<string, string> = {
   electronics: "EE10510",
   languages: "HU10512",
   civil: "CE10513",
-  general: "GN00001",
+  // "general" had no real home of its own — every one of its files has been
+  // individually reviewed and reclassified into a real subject on production
+  // (see the September 2026 cleanup). The file-seeding loop below is also
+  // dead code now (private-uploads/ no longer exists — content lives in
+  // Vercel Blob), so there is nothing left to route here.
 };
 
 const DATA_SCIENCE_MATH_PATTERN = /unit[45]|hypothesis|sampling|r-programming|r-programs|ms-excel|data-science|ma10501|ma10509|test-statistics/i;
@@ -672,30 +675,22 @@ async function main() {
   // name (the "Your name" field on /uploads) and show up individually.
   const contributor = await prisma.user.upsert({
     where: { email: "contributor@collegenoteshub.dev" },
-    update: { name: "NoteVault Team" },
-    create: { name: "NoteVault Team", email: "contributor@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
+    update: { name: "NotesVault Team" },
+    create: { name: "NotesVault Team", email: "contributor@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
   });
 
   await prisma.user.upsert({
     where: { email: "student@collegenoteshub.dev" },
     update: {},
-    create: { name: "Rohan Verma", email: "student@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
+    create: { name: "Demo Student Account", email: "student@collegenoteshub.dev", passwordHash: studentPassword, role: "STUDENT" },
   });
 
+  // This site is SGSITS-only — DAVV/IIT Indore placeholder colleges from an
+  // earlier multi-college draft were removed from production; don't reseed them.
   const sgsits = await prisma.college.upsert({
     where: { slug: "sgsits" },
     update: {},
     create: { name: "Shri G. S. Institute of Technology and Science (SGSITS)", slug: "sgsits", city: "Indore" },
-  });
-  await prisma.college.upsert({
-    where: { slug: "davv" },
-    update: {},
-    create: { name: "Devi Ahilya Vishwavidyalaya (DAVV)", slug: "davv", city: "Indore" },
-  });
-  await prisma.college.upsert({
-    where: { slug: "iit-indore" },
-    update: {},
-    create: { name: "IIT Indore", slug: "iit-indore", city: "Indore" },
   });
 
   // First-year semesters: common to all branches, so branchId stays null.

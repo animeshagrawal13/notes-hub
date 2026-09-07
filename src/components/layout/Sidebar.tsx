@@ -62,7 +62,7 @@ export default function Sidebar() {
         <img src="/sgsits-logo.webp" alt="SGSITS crest" className="h-10 w-10 shrink-0 rounded-full object-cover shadow-sm" />
         <span className="leading-tight">
           <span className="block text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">SGSITS</span>
-          <span className="block text-[16px] font-heading tracking-tight text-ink">NoteVault</span>
+          <span className="block text-[16px] font-heading tracking-tight text-ink">NotesVault</span>
         </span>
       </Link>
 

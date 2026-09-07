@@ -34,7 +34,7 @@ export default function LoginPage() {
       <Card elevated className="w-full max-w-md p-8">
         <img src="/sgsits-logo.webp" alt="SGSITS crest" className="mb-5 h-11 w-11 rounded-full object-cover shadow-sm" />
         <h1 className="mb-1 text-page font-heading tracking-[-0.01em] text-ink">Welcome back</h1>
-        <p className="mb-7 text-body-lg text-secondary">Sign in to your SGSITS NoteVault account.</p>
+        <p className="mb-7 text-body-lg text-secondary">Sign in to your SGSITS NotesVault account.</p>
 
         {error && (
           <div className="mb-4 flex items-center gap-2 rounded-input border border-[color:var(--danger)] bg-[color:var(--tint-terracotta)] px-3 py-2.5 text-body text-[color:var(--danger)]">
@@ -67,7 +67,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-meta text-secondary">
-          Browsing SGSITS NoteVault doesn&rsquo;t need an account —{' '}
+          Browsing SGSITS NotesVault doesn&rsquo;t need an account —{' '}
           <Link href="/" className="font-semibold text-sage-600 hover:underline">
             go to the notes
           </Link>
