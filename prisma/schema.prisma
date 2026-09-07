@@ -3,11 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// SQLite has no native enum support, so these fields are plain strings.
+// Postgres has native enums, but these fields stay plain strings — this
+// schema originally targeted SQLite (no enum support) and switching now
+// would mean a real migration for no functional benefit.
 // Role: STUDENT | ADMIN
 // ResourceType: NOTES | HANDWRITTEN_NOTES | PYQ | QUESTION_BANK | ASSIGNMENT | PRACTICAL
 //               | LAB_MANUAL | REFERENCE_MATERIAL | IMPORTANT_QUESTIONS | CHEAT_SHEET | SYLLABUS | SLIDES
