@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unlink } from "fs/promises";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/guards";
-import { RUNTIME_UPLOAD_DIR } from "@/lib/upload";
+import { deleteUploadedFile } from "@/lib/upload";
 
 /**
  * DELETE /api/resources/[id] — remove one of your own uploads (admins may
  * remove any). Also drops the dependent bookmark/rating/report rows and the
- * file on disk when it lives in the runtime upload dir.
+ * underlying Blob object.
  */
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const guard = await requireUser();
@@ -31,15 +29,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   await prisma.classificationLog.deleteMany({ where: { resourceId: id } });
   await prisma.resource.delete({ where: { id } });
 
-  // Only ever unlink inside the runtime upload dir — never the seeded
-  // public/uploads content, and never a path that escapes the dir.
-  if (resource.fileUrl.startsWith("/api/files/")) {
-    const rel = resource.fileUrl.replace("/api/files/", "");
-    const resolved = path.resolve(path.join(RUNTIME_UPLOAD_DIR, rel));
-    if (resolved.startsWith(path.resolve(RUNTIME_UPLOAD_DIR))) {
-      await unlink(resolved).catch(() => {});
-    }
-  }
+  await deleteUploadedFile(resource.fileUrl);
 
   return NextResponse.json({ ok: true });
 }

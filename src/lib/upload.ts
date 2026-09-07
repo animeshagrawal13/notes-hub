@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { mkdir, writeFile } from "fs/promises";
+import { put, del } from "@vercel/blob";
 import path from "path";
 
 const ALLOWED_TYPES = new Set([
@@ -12,19 +12,16 @@ const ALLOWED_TYPES = new Set([
 
 const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
-// New uploads (made after launch) are written here, separate from the
-// build-time seed content in private-uploads/. In production this should
-// point at a mounted persistent volume (e.g. /data/uploads on Railway) so
-// files survive redeploys; it defaults to a local folder for dev.
-export const RUNTIME_UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(process.cwd(), "runtime-uploads");
-
-// The seeded library. Deliberately OUTSIDE public/ so Next never serves it
-// as a static asset — everything goes through /api/files, which is the one
-// place access control and no-store headers can be enforced.
-export const SEED_UPLOAD_DIR = path.join(process.cwd(), "private-uploads");
-
 export class UploadValidationError extends Error {}
 
+/**
+ * Runtime uploads (made after launch) go straight to Vercel Blob — the
+ * deployment's own filesystem is read-only, so there is nowhere else to
+ * write them. The seeded library also lives in Blob (see
+ * scripts/migrate-to-blob.ts) so every resource.fileUrl in the database is a
+ * plain public Blob URL, used directly as the fetch/src target everywhere a
+ * reader or download link needs it — no proxy route in front of it.
+ */
 export async function saveUploadedFile(file: File, category: string) {
   if (!ALLOWED_TYPES.has(file.type)) {
     throw new UploadValidationError("Unsupported file type. Upload a PDF, DOCX, PPTX, PNG, or JPG.");
@@ -35,15 +32,24 @@ export async function saveUploadedFile(file: File, category: string) {
 
   const ext = path.extname(file.name) || "";
   const safeName = `${randomUUID()}${ext}`;
-  const uploadDir = path.join(RUNTIME_UPLOAD_DIR, category);
-  await mkdir(uploadDir, { recursive: true });
 
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadDir, safeName), buffer);
+  const blob = await put(`${category}/${safeName}`, file, {
+    access: "public",
+    addRandomSuffix: false,
+  });
 
   return {
-    fileUrl: `/api/files/${category}/${safeName}`,
+    fileUrl: blob.url,
     fileType: ext.replace(".", "").toUpperCase() || "FILE",
     fileSize: file.size,
   };
+}
+
+/** Delete a resource's underlying Blob object. Safe to call on any Blob URL. */
+export async function deleteUploadedFile(fileUrl: string) {
+  try {
+    await del(fileUrl);
+  } catch {
+    /* already gone, or not a Blob URL we own — nothing more to do */
+  }
 }

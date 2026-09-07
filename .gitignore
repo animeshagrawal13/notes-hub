@@ -47,5 +47,10 @@ next-env.d.ts
 data/
 prisma/dev.db.bak-*
 
+# seed library files now live in Vercel Blob (see scripts/migrate-to-blob.ts) —
+# these local folders are one-time staging/legacy content, not served by the app
+/private-uploads
+/private-uploads-compressed
+
 __pycache__/
 *.pyc
