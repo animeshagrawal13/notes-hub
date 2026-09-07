@@ -35,6 +35,7 @@ import {
   MoveHorizontal,
   Bookmark,
   BookmarkCheck,
+  ExternalLink,
 } from 'lucide-react';
 import { PDF_OPTIONS } from './pdf-setup';
 import { cn } from '@/lib/cn';
@@ -531,6 +532,16 @@ export default function PdfReader({
             >
               {bookmarked ? <BookmarkCheck size={16} strokeWidth={2} /> : <Bookmark size={16} strokeWidth={2} />}
             </button>
+            <a
+              href={fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open in your browser's own PDF viewer"
+              title="Open in browser"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--reader-chrome)] text-[var(--reader-chrome-ink)] shadow-lg backdrop-blur-md transition hover:bg-[var(--reader-chrome-hover)]"
+            >
+              <ExternalLink size={16} strokeWidth={2} />
+            </a>
             <button
               type="button"
               onClick={onClose}
@@ -551,6 +562,7 @@ export default function PdfReader({
               setReloadKey((k) => k + 1);
             }}
             onClose={onClose}
+            fileUrl={fileUrl}
           />
         ) : (
           <Document
@@ -869,22 +881,31 @@ function ReaderLoading({ pct }: { pct: number }) {
   );
 }
 
-function ReaderError({ onRetry, onClose }: { onRetry: () => void; onClose: () => void }) {
+function ReaderError({ onRetry, onClose, fileUrl }: { onRetry: () => void; onClose: () => void; fileUrl: string }) {
   return (
     <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
       <div className="text-[15px] font-semibold text-[var(--reader-chrome-ink)]">
         Couldn&rsquo;t open this document
       </div>
       <p className="max-w-xs text-[13px] text-[var(--reader-chrome-dim)]">
-        The PDF could not be rendered. It may still be uploading, or the file may be damaged.
+        The in-page viewer couldn&rsquo;t render this file — this can happen on some phone browsers.
+        Try again, or open it directly in your browser&rsquo;s own PDF viewer instead.
       </p>
-      <div className="mt-1 flex gap-2">
+      <div className="mt-1 flex flex-wrap justify-center gap-2">
         <button
           onClick={onRetry}
           className="rounded-full bg-[var(--reader-accent)] px-4 py-2 text-[13px] font-semibold text-white transition hover:opacity-90"
         >
           Try again
         </button>
+        <a
+          href={fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full border border-[var(--reader-hairline)] px-4 py-2 text-[13px] font-semibold text-[var(--reader-chrome-ink)] transition hover:bg-[var(--reader-chrome-hover)]"
+        >
+          Open directly
+        </a>
         <button
           onClick={onClose}
           className="rounded-full border border-[var(--reader-hairline)] px-4 py-2 text-[13px] font-semibold text-[var(--reader-chrome-ink)] transition hover:bg-[var(--reader-chrome-hover)]"

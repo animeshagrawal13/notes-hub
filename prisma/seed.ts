@@ -832,32 +832,29 @@ async function main() {
 
   console.log(`Seed complete. Resources created: ${created}, titles updated: ${updated}, unchanged: ${skipped}`);
 
-  // ── Study events (college-wide; idempotent via deleteMany + createMany) ──
-  const existingEventCount = await prisma.studyEvent.count();
-  if (existingEventCount === 0) {
-    const now = new Date();
-    const d = (offsetDays: number) => {
-      const dt = new Date(now);
-      dt.setHours(0, 0, 0, 0);
-      dt.setDate(dt.getDate() + offsetDays);
-      return dt;
-    };
-    await prisma.studyEvent.createMany({
-      data: [
-        { title: "Mathematics End-Semester Exam", date: d(14), kind: "EXAM" },
-        { title: "Applied Physics Mid-Semester Test", date: d(7), kind: "EXAM" },
-        { title: "Applied Chemistry End-Semester Exam", date: d(21), kind: "EXAM" },
-        { title: "IT & AI Assignment 3 Due", date: d(3), kind: "ASSIGNMENT" },
-        { title: "Engineering Graphics Submission", date: d(5), kind: "ASSIGNMENT" },
-        { title: "Electrical & Electronics Lab Record", date: d(10), kind: "ASSIGNMENT" },
-        { title: "Understanding Bharat Presentation", date: d(18), kind: "ASSIGNMENT" },
-        { title: "Design Thinking Project Deadline", date: d(28), kind: "EXAM" },
-      ],
-    });
-    console.log("Study events seeded.");
-  } else {
-    console.log(`Study events already exist (${existingEventCount}), skipping.`);
-  }
+  // ── Study events (college-wide) ────────────────────────────────────────
+  // Real dates from the official SGSITS Academic Calendar — Semester A
+  // (July-Dec 2026), UG/PG-I Year column (this site's audience). Replaces
+  // the old placeholder sample events entirely on every seed run.
+  await prisma.studyEvent.deleteMany({ where: { userId: null } });
+  await prisma.studyEvent.createMany({
+    data: [
+      { title: "UDBHAV (Part 1) — Orientation Program begins", date: new Date("2026-08-04"), kind: "REMINDER" },
+      { title: "Classes Begin", date: new Date("2026-08-10"), kind: "REMINDER" },
+      { title: "UDAAN '26", date: new Date("2026-08-27"), kind: "REMINDER" },
+      { title: "MST-1", date: new Date("2026-09-23"), kind: "EXAM" },
+      { title: "AAROHAN '26", date: new Date("2026-10-09"), kind: "REMINDER" },
+      { title: "MST-2", date: new Date("2026-10-27"), kind: "EXAM" },
+      { title: "Diwali Break begins", date: new Date("2026-11-05"), kind: "REMINDER" },
+      { title: "MST-3 (if needed)", date: new Date("2026-11-17"), kind: "EXAM" },
+      { title: "Classes End", date: new Date("2026-11-19"), kind: "REMINDER" },
+      { title: "Preparation Leave begins", date: new Date("2026-11-20"), kind: "REMINDER" },
+      { title: "End-Semester Exams begin (Theory + Practical)", date: new Date("2026-11-30"), kind: "EXAM" },
+      { title: "SAMARPAN '26", date: new Date("2026-12-20"), kind: "REMINDER" },
+      { title: "Semester Break begins", date: new Date("2026-12-20"), kind: "REMINDER" },
+    ],
+  });
+  console.log("Study events seeded from the official Sem A 2026-27 academic calendar.");
 
   console.log(`Admin login: admin@collegenoteshub.dev / Admin@123`);
   console.log(`Student login: student@collegenoteshub.dev / Student@123`);

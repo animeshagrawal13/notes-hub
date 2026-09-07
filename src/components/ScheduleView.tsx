@@ -6,7 +6,7 @@ import { IconButton } from '@/components/ui/IconButton';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import Modal from '@/components/ui/Modal';
-import { ChevronLeft, ChevronRight, CalendarDays, Plus, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus, Trash2, FileDown } from 'lucide-react';
 import { formatEventDate } from '@/lib/format';
 import { cn } from '@/lib/cn';
 
@@ -15,6 +15,8 @@ const KIND_STYLE: Record<string, string> = {
   ASSIGNMENT: 'bg-cream border-transparent text-cream-ink',
   REMINDER: 'bg-[color:var(--tint-lavender)] border-transparent text-[color:var(--tint-lavender-ink)]',
 };
+
+const CALENDAR_PDF_URL = 'https://fr0cg5ys41r4psru.public.blob.vercel-storage.com/schedule/academic-calendar-2026-27-semA.pdf';
 
 export default function ScheduleView({ events, isLoggedIn }: { events: any[]; isLoggedIn: boolean }) {
   const router = useRouter();
@@ -74,6 +76,24 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
 
   return (
     <div className="mx-auto max-w-4xl space-y-7">
+      <a
+        href={CALENDAR_PDF_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-between gap-3 rounded-md border border-sage-100 bg-primary-soft p-4 shadow-sm transition duration-calm ease-calm hover:border-sage-300"
+      >
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input bg-surface text-sage-700 shadow-sm">
+            <FileDown size={17} strokeWidth={1.9} />
+          </span>
+          <div>
+            <p className="text-body font-semibold text-primary-strong">Official Academic Calendar</p>
+            <p className="text-meta text-sage-700">Semester A (July–Dec 2026) — SGSITS, PDF</p>
+          </div>
+        </div>
+        <span className="text-meta font-semibold text-sage-700">Download</span>
+      </a>
+
       <div className="flex items-center justify-between rounded-md border border-border bg-surface p-4 shadow-sm">
         <IconButton icon={<ChevronLeft size={16} />} onClick={prevMonth} label="Previous month" />
         <h2 className="text-card-title font-semibold text-ink">
