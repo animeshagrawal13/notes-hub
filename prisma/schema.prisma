@@ -263,3 +263,14 @@ model StudyEvent {
 
   @@index([date])
 }
+
+// Genuine, lightweight presence tracking — a real count of distinct browser
+// sessions with a heartbeat in the last few minutes, not a fabricated number.
+// sessionId is a random id the client generates once and keeps in
+// localStorage; no account, no personal data.
+model Presence {
+  sessionId String   @id
+  lastSeen  DateTime @default(now())
+
+  @@index([lastSeen])
+}

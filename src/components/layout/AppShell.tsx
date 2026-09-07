@@ -11,6 +11,7 @@ import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import BottomNav from './BottomNav';
 import MobileDrawer from './MobileDrawer';
+import ActiveUsers from './ActiveUsers';
 import CommandPalette from './CommandPalette';
 import { ShellProvider, useShell } from './ShellContext';
 import { ToastProvider } from '@/components/ui/Toast';
@@ -52,6 +53,7 @@ function ShellBody({ children }: { children: ReactNode }) {
       </div>
       <BottomNav />
       <MobileDrawer />
+      <ActiveUsers />
 
       {/* Site-wide gesture navigation chrome — right-click/arrows/swipe/side
           buttons drive real browser history (see NavContext); all paused
