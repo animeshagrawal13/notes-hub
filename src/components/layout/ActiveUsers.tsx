@@ -60,7 +60,7 @@ export default function ActiveUsers() {
 
   return (
     <div
-      className="fixed bottom-4 left-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-1.5 text-micro font-medium text-secondary shadow-sm backdrop-blur-sm sm:flex"
+      className="fixed right-4 top-[72px] z-30 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-1.5 text-micro font-medium text-secondary shadow-sm backdrop-blur-sm sm:flex"
       aria-live="polite"
     >
       <span className="relative flex h-2 w-2">

@@ -39,6 +39,16 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const blanks = Array.from({ length: firstDay }, (_, i) => i);
 
+  // Side panel — matches the reference calendar's "DAYS" / "HOLIDAYS" info block.
+  const holidaysThisMonth = monthEvents
+    .filter((e) => e.title === 'Holiday')
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const nonHolidayOffDays = days.filter((d) => {
+    const dow = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d).getDay();
+    return dow === 0 || dow === 6;
+  }).length;
+  const classDays = daysInMonth - nonHolidayOffDays - holidaysThisMonth.length;
+
   async function handleAdd() {
     if (!form.title.trim() || !form.date) {
       toast('Title and date are required', 'error');
@@ -102,43 +112,73 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
         <IconButton icon={<ChevronRight size={16} />} onClick={nextMonth} label="Next month" />
       </div>
 
-      <div className="overflow-hidden rounded-md border border-border shadow-sm">
-        <div className="grid grid-cols-7 border-b border-border bg-surface-soft">
-          {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((d) => (
-            <div key={d} className="py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-text-faint">
-              <span className="sm:hidden">{d.slice(0, 3)}</span>
-              <span className="hidden sm:inline">{d}</span>
-            </div>
-          ))}
-        </div>
-        <div className="grid grid-cols-7 [&>div]:border-r [&>div]:border-b [&>div:nth-child(7n)]:border-r-0 border-border">
-          {blanks.map((b) => (
-            <div key={`blank-${b}`} className="min-h-[64px] bg-surface-soft/40 sm:min-h-[92px]" />
-          ))}
-          {days.map((d) => {
-            const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d);
-            const dow = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
-            const dayEvents = monthEvents.filter((e) => new Date(e.date).getDate() === d);
-            const primary = dayEvents[0];
-            const isWeekend = dow === 0 || dow === 6;
-            const weekendLabel = dow === 0 ? 'Sunday' : dow === 6 ? 'Saturday' : null;
-
-            const tint = primary ? KIND_STYLE[primary.kind] ?? KIND_STYLE.REMINDER : isWeekend ? 'bg-surface-soft text-text-faint' : 'bg-surface';
-
-            return (
-              <div key={d} className={cn('min-h-[64px] p-1.5 sm:min-h-[92px] sm:p-2', tint)}>
-                <div className="text-right text-[11px] font-semibold sm:text-body">{d}</div>
-                {(primary || weekendLabel) && (
-                  <div className="mt-1 truncate text-left text-[10px] font-medium leading-tight sm:text-meta" title={primary?.title ?? weekendLabel ?? undefined}>
-                    {primary ? primary.title : weekendLabel}
-                  </div>
-                )}
-                {dayEvents.length > 1 && (
-                  <div className="text-left text-[10px] text-text-faint">+{dayEvents.length - 1} more</div>
-                )}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_220px]">
+        <div className="overflow-hidden rounded-md border border-border shadow-sm">
+          <div className="grid grid-cols-7 border-b border-border bg-surface-soft">
+            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((d) => (
+              <div key={d} className="py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-text-faint">
+                <span className="sm:hidden">{d.slice(0, 3)}</span>
+                <span className="hidden sm:inline">{d}</span>
               </div>
-            );
-          })}
+            ))}
+          </div>
+          <div className="grid grid-cols-7 [&>div]:border-r [&>div]:border-b [&>div:nth-child(7n)]:border-r-0 border-border">
+            {blanks.map((b) => (
+              <div key={`blank-${b}`} className="min-h-[64px] bg-surface-soft/40 sm:min-h-[92px]" />
+            ))}
+            {days.map((d) => {
+              const dateObj = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d);
+              const dow = dateObj.getDay(); // 0 = Sunday, 6 = Saturday
+              const dayEvents = monthEvents.filter((e) => new Date(e.date).getDate() === d);
+              const primary = dayEvents[0];
+              const isWeekend = dow === 0 || dow === 6;
+              const weekendLabel = dow === 0 ? 'Sunday' : dow === 6 ? 'Saturday' : null;
+
+              const tint = primary ? KIND_STYLE[primary.kind] ?? KIND_STYLE.REMINDER : isWeekend ? 'bg-surface-soft text-text-faint' : 'bg-surface';
+
+              return (
+                <div key={d} className={cn('min-h-[64px] p-1.5 sm:min-h-[92px] sm:p-2', tint)}>
+                  <div className="text-right text-[11px] font-semibold sm:text-body">{d}</div>
+                  {(primary || weekendLabel) && (
+                    <div className="mt-1 truncate text-left text-[10px] font-medium leading-tight sm:text-meta" title={primary?.title ?? weekendLabel ?? undefined}>
+                      {primary ? primary.title : weekendLabel}
+                    </div>
+                  )}
+                  {dayEvents.length > 1 && (
+                    <div className="text-left text-[10px] text-text-faint">+{dayEvents.length - 1} more</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Side info panel — Days / Holidays, matching the reference calendar */}
+        <div className="flex flex-col gap-4">
+          <div className="overflow-hidden rounded-md border border-border shadow-sm">
+            <div className="bg-surface-soft px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-faint">
+              Days
+            </div>
+            <div className="p-3 text-body font-semibold text-ink">
+              Class — {Math.max(classDays, 0)} Days
+            </div>
+          </div>
+          <div className="overflow-hidden rounded-md border border-border shadow-sm">
+            <div className="bg-surface-soft px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-faint">
+              Holidays
+            </div>
+            <div className="space-y-1.5 p-3">
+              {holidaysThisMonth.length > 0 ? (
+                holidaysThisMonth.map((h) => (
+                  <div key={h.id} className="text-meta text-secondary">
+                    {new Date(h.date).getDate()} — Holiday
+                  </div>
+                ))
+              ) : (
+                <div className="text-meta text-text-faint">None</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
