@@ -830,42 +830,49 @@ async function main() {
   // ── Study events (college-wide) ────────────────────────────────────────
   // Real dates from the official SGSITS Academic Calendar — Semester A
   // (July-Dec 2026), UG/PG-I Year column (this site's audience). Replaces
-  // the old placeholder sample events entirely on every seed run.
+  // the old placeholder sample events entirely on every seed run. Every
+  // multi-day window on the official calendar (MSTs, Diwali Break, Prep
+  // Leave, End-Sem Exams, Semester Break, AAROHAN, UDBHAV Part-1) gets one
+  // entry per day so the whole span is coloured on the Schedule page, not
+  // just its first day.
+  function studyEventRange(title: string, kind: string, startISO: string, endISO: string) {
+    const out: { title: string; date: Date; kind: string }[] = [];
+    const start = new Date(startISO);
+    const end = new Date(endISO);
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      out.push({ title, date: new Date(d), kind });
+    }
+    return out;
+  }
+
   await prisma.studyEvent.deleteMany({ where: { userId: null } });
   await prisma.studyEvent.createMany({
     data: [
-      { title: "UDBHAV (Part 1) — Orientation Program begins", date: new Date("2026-08-04"), kind: "REMINDER" },
+      ...studyEventRange("UDBHAV (Part 1) — Orientation Program", "REMINDER", "2026-08-04", "2026-08-07"),
       { title: "Classes Begin", date: new Date("2026-08-10"), kind: "REMINDER" },
       { title: "UDAAN '26", date: new Date("2026-08-27"), kind: "REMINDER" },
-      // Each MST is a 3-day window on the official calendar, not a single
-      // date — every day in the window gets its own EXAM entry so the whole
-      // span is highlighted on the calendar, not just the first day.
-      { title: "MST-1", date: new Date("2026-09-23"), kind: "EXAM" },
-      { title: "MST-1", date: new Date("2026-09-24"), kind: "EXAM" },
-      { title: "MST-1", date: new Date("2026-09-25"), kind: "EXAM" },
-      { title: "AAROHAN '26", date: new Date("2026-10-09"), kind: "REMINDER" },
-      { title: "MST-2", date: new Date("2026-10-27"), kind: "EXAM" },
-      { title: "MST-2", date: new Date("2026-10-28"), kind: "EXAM" },
-      { title: "MST-2", date: new Date("2026-10-29"), kind: "EXAM" },
-      { title: "Diwali Break begins", date: new Date("2026-11-05"), kind: "REMINDER" },
-      { title: "MST-3 (if needed)", date: new Date("2026-11-17"), kind: "EXAM" },
-      { title: "MST-3 (if needed)", date: new Date("2026-11-18"), kind: "EXAM" },
-      { title: "MST-3 (if needed)", date: new Date("2026-11-19"), kind: "EXAM" },
+      ...studyEventRange("MST-1", "EXAM", "2026-09-23", "2026-09-25"),
+      ...studyEventRange("AAROHAN '26", "REMINDER", "2026-10-09", "2026-10-10"),
+      ...studyEventRange("MST-2", "EXAM", "2026-10-27", "2026-10-29"),
+      ...studyEventRange("Diwali Break", "REMINDER", "2026-11-05", "2026-11-11"),
+      ...studyEventRange("MST-3 (if needed)", "EXAM", "2026-11-17", "2026-11-19"),
       { title: "Classes End", date: new Date("2026-11-19"), kind: "REMINDER" },
-      { title: "Preparation Leave begins", date: new Date("2026-11-20"), kind: "REMINDER" },
-      { title: "End-Semester Exams begin (Theory + Practical)", date: new Date("2026-11-30"), kind: "EXAM" },
-      { title: "SAMARPAN '26", date: new Date("2026-12-20"), kind: "REMINDER" },
-      { title: "Semester Break begins", date: new Date("2026-12-20"), kind: "REMINDER" },
+      ...studyEventRange("Preparation Leave", "REMINDER", "2026-11-20", "2026-11-29"),
+      ...studyEventRange("End-Semester Exams (Theory + Practical)", "EXAM", "2026-11-30", "2026-12-19"),
+      ...studyEventRange("SAMARPAN '26", "REMINDER", "2026-12-20", "2026-12-22"),
+      ...studyEventRange("Semester Break", "REMINDER", "2026-12-20", "2026-12-27"),
       // Official list of holidays (in each month), from the same calendar.
-      { title: "Holiday", date: new Date("2026-08-26"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-08-28"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-09-04"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-09-14"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-10-02"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-10-20"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-10-26"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-11-09"), kind: "REMINDER" },
-      { title: "Holiday", date: new Date("2026-11-24"), kind: "REMINDER" },
+      // Dates are from the SGSITS calendar (names only); the reason for
+      // each is from the MP govt 2026 holiday notification (Indore/Bhopal).
+      { title: "Holiday — Milad-un-Nabi", date: new Date("2026-08-26"), kind: "REMINDER" },
+      { title: "Holiday — Raksha Bandhan", date: new Date("2026-08-28"), kind: "REMINDER" },
+      { title: "Holiday — Janmashtami", date: new Date("2026-09-04"), kind: "REMINDER" },
+      { title: "Holiday — Ganesh Chaturthi", date: new Date("2026-09-14"), kind: "REMINDER" },
+      { title: "Holiday — Gandhi Jayanti", date: new Date("2026-10-02"), kind: "REMINDER" },
+      { title: "Holiday — Dussehra", date: new Date("2026-10-20"), kind: "REMINDER" },
+      { title: "Holiday — Maharishi Valmiki Jayanti", date: new Date("2026-10-26"), kind: "REMINDER" },
+      { title: "Holiday — Govardhan Puja / Vishwakarma Day", date: new Date("2026-11-09"), kind: "REMINDER" },
+      { title: "Holiday — Guru Nanak Jayanti", date: new Date("2026-11-24"), kind: "REMINDER" },
     ],
   });
   console.log("Study events seeded from the official Sem A 2026-27 academic calendar.");

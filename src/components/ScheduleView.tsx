@@ -41,7 +41,7 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
 
   // Side panel — matches the reference calendar's "DAYS" / "HOLIDAYS" info block.
   const holidaysThisMonth = monthEvents
-    .filter((e) => e.title === 'Holiday')
+    .filter((e) => e.title.startsWith('Holiday'))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   const nonHolidayOffDays = days.filter((d) => {
     const dow = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), d).getDay();
@@ -186,7 +186,7 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
               {holidaysThisMonth.length > 0 ? (
                 holidaysThisMonth.map((h) => (
                   <div key={h.id} className="text-meta text-secondary">
-                    {new Date(h.date).getDate()} — Holiday
+                    {new Date(h.date).getDate()} — {h.title.replace(/^Holiday\s*—?\s*/, '') || 'Holiday'}
                   </div>
                 ))
               ) : (
