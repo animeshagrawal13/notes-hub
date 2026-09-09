@@ -18,7 +18,9 @@ export const dynamic = 'force-dynamic';
  * — every number and list below is a real, site-wide fact about the library.
  */
 export default async function HomePage() {
-  const [subjectCount, noteCount, pyqCount, pageSum, recentNotes, topNotes, topSubjects] =
+  let subjectCount, noteCount, pyqCount, pageSum, recentNotes, topNotes, topSubjects;
+  try {
+    [subjectCount, noteCount, pyqCount, pageSum, recentNotes, topNotes, topSubjects] =
     await Promise.all([
       prisma.subject.count(),
       prisma.resource.count({ where: { status: 'APPROVED' } }),
@@ -42,6 +44,13 @@ export default async function HomePage() {
         include: { _count: { select: { resources: true } } },
       }),
     ]);
+  } catch (err: any) {
+    return (
+      <pre style={{ whiteSpace: 'pre-wrap', padding: 20, fontSize: 12 }}>
+        {'TEMP-DEBUG: ' + (err?.message || String(err)) + '\n\n' + (err?.stack || '')}
+      </pre>
+    );
+  }
 
   const bookmarkedIds = getBookmarkedIds();
   const pages = pageSum._sum.pageCount ?? 0;
