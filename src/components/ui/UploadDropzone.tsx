@@ -49,7 +49,7 @@ export function UploadDropzone({
       <span className="text-body-lg font-semibold text-sage-800">
         {file ? file.name : 'Click to choose or drag a file here'}
       </span>
-      <span className="text-meta text-muted">PDF, DOCX, PPTX, images up to 50 MB</span>
+      <span className="text-meta text-muted">PDF, DOCX, PPTX, images up to 15 MB</span>
       <input
         ref={inputRef}
         type="file"
