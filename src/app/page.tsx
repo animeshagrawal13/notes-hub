@@ -44,11 +44,35 @@ export default async function HomePage() {
         include: { _count: { select: { resources: true } } },
       }),
     ]);
-  } catch (err: any) {
+  } catch (err) {
+    // A transient DB hiccup (e.g. a cold-start connection blip on Prisma
+    // Postgres) shouldn't take the whole homepage down with a raw 500 —
+    // log it server-side and degrade to the quick-actions grid instead.
+    console.error('Homepage stats query failed:', err);
     return (
-      <pre style={{ whiteSpace: 'pre-wrap', padding: 20, fontSize: 12 }}>
-        {'TEMP-DEBUG: ' + (err?.message || String(err)) + '\n\n' + (err?.stack || '')}
-      </pre>
+      <div className="space-y-10">
+        <section className="rounded-lg border border-border bg-surface px-6 py-8 shadow-sm sm:px-9 sm:py-10">
+          <p className="text-micro font-semibold uppercase tracking-[0.16em] text-text-faint">
+            SGSITS NotesVault
+          </p>
+          <h1 className="mt-2.5 text-[clamp(1.9rem,4vw,2.6rem)] font-heading leading-[1.12] tracking-[-0.02em] text-ink">
+            Welcome
+          </h1>
+          <p className="mt-3 max-w-md text-body-lg leading-relaxed text-secondary">
+            Unit-wise notes, slides and previous year papers for every first-year subject at
+            SGSITS — open to everyone, no account needed.
+          </p>
+        </section>
+        <p className="text-center text-meta text-muted">
+          Having trouble loading the dashboard — try refreshing, or jump straight in below.
+        </p>
+        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          <QuickAction href="/notes" label="Browse Notes" hint="Every note in the library" Icon={FileText} emphasis="solid" />
+          <QuickAction href="/subjects" label="Subjects" hint="Browse by subject" Icon={BookOpen} />
+          <QuickAction href="/pyq" label="Explore PYQs" hint="Previous year papers" Icon={ScrollText} />
+          <QuickAction href="/browse" label="Browse by College" hint="Year and semester" Icon={Building2} />
+        </div>
+      </div>
     );
   }
 
