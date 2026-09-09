@@ -63,7 +63,7 @@ function stem(w: string): string {
   return s.length > 6 ? s.slice(0, 6) : s;
 }
 
-function groupByChapter(items: any[], units: { number: number; title: string }[]) {
+function groupByChapter(items: any[], units: { id: string; number: number; title: string }[]) {
   const complete = items.filter((r) => COMPLETE_RE.test(r.title));
   const rest = items.filter((r) => !COMPLETE_RE.test(r.title));
 
@@ -76,6 +76,15 @@ function groupByChapter(items: any[], units: { number: number; title: string }[]
   const leftover: any[] = [];
 
   for (const r of rest) {
+    // A real Unit assignment on the resource itself (verified against the
+    // file's actual content — see scripts/assign-units-from-content.ts) is
+    // ground truth, so it wins over any title guess.
+    const dbIdx = r.unitId ? unitStems.findIndex((u) => u.id === r.unitId) : -1;
+    if (dbIdx >= 0) {
+      chapters[dbIdx].items.push(r);
+      continue;
+    }
+
     // An explicit "Unit N" in the title is a much stronger signal than fuzzy
     // keyword overlap — trust it directly when this subject has that many units.
     const unitMatch = r.title.match(UNIT_NUMBER_RE);
@@ -109,7 +118,7 @@ function ChapterSections({
   emptyTitle,
 }: {
   items: any[];
-  units: { number: number; title: string }[];
+  units: { id: string; number: number; title: string }[];
   bookmarkedIds?: Set<string>;
   emptyTitle: string;
 }) {
@@ -171,11 +180,11 @@ export default function SubjectTabs({
 }) {
   const [active, setActive] = useState('books');
 
-  let units: { number: number; title: string }[] = [];
+  let units: { id: string; number: number; title: string }[] = [];
   let books: any[] = [], notes: any[] = [], slides: any[] = [], pyqs: any[] = [], other: any[] = [];
   let bucketingFailed = false;
   try {
-    units = (subject.units || []).map((u: any) => ({ number: u.number, title: u.title }));
+    units = (subject.units || []).map((u: any) => ({ id: u.id, number: u.number, title: u.title }));
     const buckets = { books: [] as any[], notes: [] as any[], slides: [] as any[], pyq: [] as any[], other: [] as any[] };
     for (const r of resources) buckets[bucketOf(r)].push(r);
     ({ books, notes, slides, pyq: pyqs, other } = buckets);
