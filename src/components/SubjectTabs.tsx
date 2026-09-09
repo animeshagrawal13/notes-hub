@@ -23,6 +23,135 @@ function isEndSem(title: string) {
   return /end[\s-]?sem|end[\s-]?of[\s-]?semester/i.test(title);
 }
 
+// A handful of imports carry a `type` that doesn't match what the title says
+// (a Drive import script guessed wrong). The title is the more reliable
+// signal, so a strong one here overrides the stored type for display —
+// this doesn't touch the DB, it only fixes which tab a resource lands in.
+const SLIDES_TITLE_RE = /\bslides?\b|\bppt\b/i;
+const PYQ_TITLE_RE = /\bmst\b|end[\s-]?sem|question paper|previous year|\bpyq\b|sample paper|model paper/i;
+const NOTES_TITLE_RE = /\bnotes?\b/i;
+
+function bucketOf(r: { type: string; title: string }): 'books' | 'notes' | 'slides' | 'pyq' | 'other' {
+  const title = r.title || '';
+  if (SLIDES_TITLE_RE.test(title)) return 'slides';
+  if (PYQ_TITLE_RE.test(title)) return 'pyq';
+  if (BOOK_TYPES.has(r.type)) return 'books';
+  if (NOTES_TYPES.has(r.type) || NOTES_TITLE_RE.test(title)) return 'notes';
+  if (SLIDES_TYPES.has(r.type)) return 'slides';
+  if (PYQ_TYPES.has(r.type)) return 'pyq';
+  return 'other';
+}
+
+// ── Chapter-wise grouping for Notes / Class Slides ──────────────────────────
+// Uses the subject's real syllabus units (Subject.units, seeded verbatim from
+// the official SGSITS syllabus) instead of a generic "Other Materials" dump.
+const STOPWORDS = new Set([
+  'the', 'a', 'an', 'of', 'and', 'or', 'to', 'in', 'for', 'on', 'with', 'is', 'are', 'by', 'from',
+  'as', 'at', 'into', 'notes', 'note', 'unit', 'class', 'slides', 'slide', 'additional', 'set',
+  'engineering', 'engineers', 'fundamentals', 'fundamental', 'introduction', 'overview', 'basic',
+  'basics', 'applied', 'general', 'first', 'year',
+]);
+const COMPLETE_RE = /\bcomplete\b|\bfull notes\b|\ball units\b|\bentire\b|\bwhole syllabus\b/i;
+const UNIT_NUMBER_RE = /\bunit\s*-?\s*([1-9])\b/i;
+
+function words(s: string): string[] {
+  return (s.toLowerCase().match(/[a-z]{3,}/g) || []).filter((w) => !STOPWORDS.has(w));
+}
+// Loose stem so "laser"/"lasers", "computing"/"computation" etc still line up.
+function stem(w: string): string {
+  const s = w.length > 4 && w.endsWith('s') ? w.slice(0, -1) : w;
+  return s.length > 6 ? s.slice(0, 6) : s;
+}
+
+function groupByChapter(items: any[], units: { number: number; title: string }[]) {
+  const complete = items.filter((r) => COMPLETE_RE.test(r.title));
+  const rest = items.filter((r) => !COMPLETE_RE.test(r.title));
+
+  const unitStems = units.map((u) => ({ ...u, stems: new Set(words(u.title).map(stem)) }));
+  const chapters: { number: number; title: string; items: any[] }[] = unitStems.map((u) => ({
+    number: u.number,
+    title: u.title,
+    items: [],
+  }));
+  const leftover: any[] = [];
+
+  for (const r of rest) {
+    // An explicit "Unit N" in the title is a much stronger signal than fuzzy
+    // keyword overlap — trust it directly when this subject has that many units.
+    const unitMatch = r.title.match(UNIT_NUMBER_RE);
+    const explicitIdx = unitMatch ? unitStems.findIndex((u) => u.number === Number(unitMatch[1])) : -1;
+    if (explicitIdx >= 0) {
+      chapters[explicitIdx].items.push(r);
+      continue;
+    }
+
+    const rStems = words(r.title).map(stem);
+    let best = -1;
+    let bestScore = 0;
+    unitStems.forEach((u, i) => {
+      const score = rStems.filter((s) => u.stems.has(s)).length;
+      if (score > bestScore) {
+        bestScore = score;
+        best = i;
+      }
+    });
+    if (best >= 0 && bestScore > 0) chapters[best].items.push(r);
+    else leftover.push(r);
+  }
+
+  return { chapters: chapters.filter((c) => c.items.length > 0), leftover, complete };
+}
+
+function ChapterSections({
+  items,
+  units,
+  bookmarkedIds,
+  emptyTitle,
+}: {
+  items: any[];
+  units: { number: number; title: string }[];
+  bookmarkedIds?: Set<string>;
+  emptyTitle: string;
+}) {
+  if (items.length === 0) return <EmptyState title={emptyTitle} body="Be the first to upload." />;
+
+  const { chapters, leftover, complete } = groupByChapter(items, units);
+
+  // No syllabus units for this subject, or nothing matched any chapter —
+  // just show the flat list rather than a pile of empty sub-headers.
+  if (chapters.length === 0 && complete.length === 0) {
+    return <NoteListTable notes={items} bookmarkedIds={bookmarkedIds} />;
+  }
+
+  return (
+    <div className="space-y-8">
+      {chapters.map((c) => (
+        <section key={c.number} className="space-y-3">
+          <h3 className="flex items-center gap-2 text-card-title font-semibold text-ink">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-tiny bg-primary-soft text-micro font-bold text-primary-strong">
+              {c.number}
+            </span>
+            {c.title}
+          </h3>
+          <NoteListTable notes={c.items} bookmarkedIds={bookmarkedIds} />
+        </section>
+      ))}
+      {leftover.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-card-title font-semibold text-ink">Other</h3>
+          <NoteListTable notes={leftover} bookmarkedIds={bookmarkedIds} />
+        </section>
+      )}
+      {complete.length > 0 && (
+        <section className="space-y-3">
+          <h3 className="text-card-title font-semibold text-ink">Complete Notes</h3>
+          <NoteListTable notes={complete} bookmarkedIds={bookmarkedIds} />
+        </section>
+      )}
+    </div>
+  );
+}
+
 export default function SubjectTabs({
   subject,
   resources,
@@ -32,11 +161,15 @@ export default function SubjectTabs({
   resources: any[];
   bookmarkedIds?: Set<string>;
 }) {
-  const books = resources.filter((r) => BOOK_TYPES.has(r.type));
-  const notes = resources.filter((r) => NOTES_TYPES.has(r.type));
-  const slides = resources.filter((r) => SLIDES_TYPES.has(r.type));
-  const pyqs = resources.filter((r) => PYQ_TYPES.has(r.type));
-  const other = resources.filter((r) => OTHER_TYPES.has(r.type));
+  const units: { number: number; title: string }[] = (subject.units || []).map((u: any) => ({
+    number: u.number,
+    title: u.title,
+  }));
+
+  const buckets = { books: [] as any[], notes: [] as any[], slides: [] as any[], pyq: [] as any[], other: [] as any[] };
+  for (const r of resources) buckets[bucketOf(r)].push(r);
+
+  const { books, notes, slides, pyq: pyqs, other } = buckets;
 
   const mstPyqs = pyqs.filter((r) => isMst(r.title));
   const endSemPyqs = pyqs.filter((r) => isEndSem(r.title) && !isMst(r.title));
@@ -62,11 +195,11 @@ export default function SubjectTabs({
       )}
 
       {activeKey === 'notes' && (
-        <NoteListTable notes={notes} bookmarkedIds={bookmarkedIds} emptyTitle="No notes yet" />
+        <ChapterSections items={notes} units={units} bookmarkedIds={bookmarkedIds} emptyTitle="No notes yet" />
       )}
 
       {activeKey === 'slides' && (
-        <NoteListTable notes={slides} bookmarkedIds={bookmarkedIds} emptyTitle="No class slides yet" />
+        <ChapterSections items={slides} units={units} bookmarkedIds={bookmarkedIds} emptyTitle="No class slides yet" />
       )}
 
       {activeKey === 'pyq' && (
