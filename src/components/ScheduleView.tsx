@@ -28,10 +28,6 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
 
   const prevMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
   const nextMonth = () => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
-  const goToday = () => setCurrentMonth(new Date());
-
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear() === currentMonth.getFullYear() && today.getMonth() === currentMonth.getMonth();
 
   const monthEvents = events.filter((e) => {
     const d = new Date(e.date);
@@ -114,14 +110,6 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
           <h2 className="text-card-title font-semibold text-ink">
             {currentMonth.toLocaleString('default', { month: 'long' })} {currentMonth.getFullYear()}
           </h2>
-          {!isCurrentMonth && (
-            <button
-              onClick={goToday}
-              className="rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-secondary transition duration-calm ease-calm hover:border-sage-300 hover:text-sage-700"
-            >
-              Today
-            </button>
-          )}
         </div>
         <IconButton icon={<ChevronRight size={16} />} onClick={nextMonth} label="Next month" />
       </div>
@@ -136,9 +124,6 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--tint-lavender)]" /> Holiday / Reminder
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-2.5 w-2.5 rounded-full border-2 border-sage-500" /> Today
         </span>
       </div>
 
@@ -165,10 +150,9 @@ export default function ScheduleView({ events, isLoggedIn }: { events: any[]; is
               const weekendLabel = dow === 0 ? 'Sunday' : dow === 6 ? 'Saturday' : null;
 
               const tint = primary ? KIND_STYLE[primary.kind] ?? KIND_STYLE.REMINDER : isWeekend ? 'bg-surface-soft text-text-faint' : 'bg-surface';
-              const isToday = isCurrentMonth && d === today.getDate();
 
               return (
-                <div key={d} className={cn('min-h-[64px] p-1.5 sm:min-h-[92px] sm:p-2', tint, isToday && 'ring-2 ring-inset ring-sage-500')}>
+                <div key={d} className={cn('min-h-[64px] p-1.5 sm:min-h-[92px] sm:p-2', tint)}>
                   <div className="text-right text-[11px] font-semibold sm:text-body">{d}</div>
                   {(primary || weekendLabel) && (
                     <div className="mt-1 truncate text-left text-[10px] font-medium leading-tight sm:text-meta" title={primary?.title ?? weekendLabel ?? undefined}>

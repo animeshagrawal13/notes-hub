@@ -100,12 +100,6 @@ export default function NoteListItem({
         <span className="hidden w-[150px] shrink-0 truncate text-meta text-secondary lg:block">
           {middleColumn === "subject" ? note.subject?.name ?? "—" : note.uploadedBy?.name ?? "—"}
         </span>
-        {/* relativeTime is computed from Date.now(), so the server and the
-            client can straddle a minute boundary and disagree — that would
-            otherwise blow away the whole hydrated tree. */}
-        <span className="w-[74px] shrink-0 text-right text-meta text-muted" suppressHydrationWarning>
-          {note.updatedAt ? relativeTime(note.updatedAt) : "—"}
-        </span>
         {trailing}
         {bookmarked !== undefined && (
           <BookmarkButton resourceId={note.id} className="shrink-0" />

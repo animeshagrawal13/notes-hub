@@ -38,7 +38,6 @@ export function NoteListTable({
         <span className="min-w-0 flex-1">Title</span>
         {!hideType && <span className="hidden w-[112px] shrink-0 sm:block">Type</span>}
         <span className="hidden w-[150px] shrink-0 lg:block">Uploaded by</span>
-        <span className="w-[74px] shrink-0 text-right">Updated</span>
         {bookmarkedIds && <span className="w-8 shrink-0" aria-hidden />}
       </div>
       <ul className="divide-y divide-border-soft">

@@ -38,7 +38,6 @@ export default async function UploadsPage() {
               <span className="min-w-0 flex-1">Title</span>
               <span className="hidden w-[112px] shrink-0 sm:block">Type</span>
               <span className="hidden w-[150px] shrink-0 lg:block">Subject</span>
-              <span className="w-[74px] shrink-0 text-right">Added</span>
               <span className="w-[92px] shrink-0 text-right">Status</span>
               <span className="w-8 shrink-0" aria-hidden />
             </div>

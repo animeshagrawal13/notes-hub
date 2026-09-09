@@ -837,11 +837,20 @@ async function main() {
       { title: "UDBHAV (Part 1) — Orientation Program begins", date: new Date("2026-08-04"), kind: "REMINDER" },
       { title: "Classes Begin", date: new Date("2026-08-10"), kind: "REMINDER" },
       { title: "UDAAN '26", date: new Date("2026-08-27"), kind: "REMINDER" },
+      // Each MST is a 3-day window on the official calendar, not a single
+      // date — every day in the window gets its own EXAM entry so the whole
+      // span is highlighted on the calendar, not just the first day.
       { title: "MST-1", date: new Date("2026-09-23"), kind: "EXAM" },
+      { title: "MST-1", date: new Date("2026-09-24"), kind: "EXAM" },
+      { title: "MST-1", date: new Date("2026-09-25"), kind: "EXAM" },
       { title: "AAROHAN '26", date: new Date("2026-10-09"), kind: "REMINDER" },
       { title: "MST-2", date: new Date("2026-10-27"), kind: "EXAM" },
+      { title: "MST-2", date: new Date("2026-10-28"), kind: "EXAM" },
+      { title: "MST-2", date: new Date("2026-10-29"), kind: "EXAM" },
       { title: "Diwali Break begins", date: new Date("2026-11-05"), kind: "REMINDER" },
       { title: "MST-3 (if needed)", date: new Date("2026-11-17"), kind: "EXAM" },
+      { title: "MST-3 (if needed)", date: new Date("2026-11-18"), kind: "EXAM" },
+      { title: "MST-3 (if needed)", date: new Date("2026-11-19"), kind: "EXAM" },
       { title: "Classes End", date: new Date("2026-11-19"), kind: "REMINDER" },
       { title: "Preparation Leave begins", date: new Date("2026-11-20"), kind: "REMINDER" },
       { title: "End-Semester Exams begin (Theory + Practical)", date: new Date("2026-11-30"), kind: "EXAM" },
