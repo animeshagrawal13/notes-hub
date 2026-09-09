@@ -84,11 +84,17 @@ const STATUS_TONE: Record<string, BadgeTone> = {
   DISMISSED: "neutral",
 };
 
+// Uploads go live immediately now (no manual approval step) — "Approved"
+// reads as if someone reviewed it, which nothing does anymore.
+const STATUS_LABEL: Record<string, string> = {
+  APPROVED: "Uploaded",
+};
+
 /** Moderation status — the only place semantic colour is allowed to show up. */
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   return (
     <Badge tone={STATUS_TONE[status] ?? "neutral"} className={className}>
-      {status.charAt(0) + status.slice(1).toLowerCase()}
+      {STATUS_LABEL[status] ?? status.charAt(0) + status.slice(1).toLowerCase()}
     </Badge>
   );
 }

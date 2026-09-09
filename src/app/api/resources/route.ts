@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       tags,
       type,
       academicYear,
-      status: "PENDING",
+      status: "APPROVED",
       subjectId,
       unitId,
       uploadedById,
