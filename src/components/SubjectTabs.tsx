@@ -115,7 +115,16 @@ function ChapterSections({
 }) {
   if (items.length === 0) return <EmptyState title={emptyTitle} body="Be the first to upload." />;
 
-  const { chapters, leftover, complete } = groupByChapter(items, units);
+  let chapters, leftover, complete;
+  try {
+    ({ chapters, leftover, complete } = groupByChapter(items, units));
+  } catch (err: any) {
+    return (
+      <pre style={{ whiteSpace: 'pre-wrap', padding: 20, fontSize: 12 }}>
+        {'TEMP-DEBUG(chapters): ' + (err?.message || String(err)) + '\n' + (err?.stack || '')}
+      </pre>
+    );
+  }
 
   // No syllabus units for this subject, or nothing matched any chapter —
   // just show the flat list rather than a pile of empty sub-headers.
@@ -161,15 +170,23 @@ export default function SubjectTabs({
   resources: any[];
   bookmarkedIds?: Set<string>;
 }) {
-  const units: { number: number; title: string }[] = (subject.units || []).map((u: any) => ({
-    number: u.number,
-    title: u.title,
-  }));
+  const [active, setActive] = useState('books');
 
-  const buckets = { books: [] as any[], notes: [] as any[], slides: [] as any[], pyq: [] as any[], other: [] as any[] };
-  for (const r of resources) buckets[bucketOf(r)].push(r);
+  let units: { number: number; title: string }[] = [];
+  let books: any[] = [], notes: any[] = [], slides: any[] = [], pyqs: any[] = [], other: any[] = [];
+  let debugError: string | null = null;
+  try {
+    units = (subject.units || []).map((u: any) => ({ number: u.number, title: u.title }));
+    const buckets = { books: [] as any[], notes: [] as any[], slides: [] as any[], pyq: [] as any[], other: [] as any[] };
+    for (const r of resources) buckets[bucketOf(r)].push(r);
+    ({ books, notes, slides, pyq: pyqs, other } = buckets);
+  } catch (err: any) {
+    debugError = 'TEMP-DEBUG: ' + (err?.message || String(err)) + '\n' + (err?.stack || '');
+  }
 
-  const { books, notes, slides, pyq: pyqs, other } = buckets;
+  if (debugError) {
+    return <pre style={{ whiteSpace: 'pre-wrap', padding: 20, fontSize: 12 }}>{debugError}</pre>;
+  }
 
   const mstPyqs = pyqs.filter((r) => isMst(r.title));
   const endSemPyqs = pyqs.filter((r) => isEndSem(r.title) && !isMst(r.title));
@@ -183,7 +200,6 @@ export default function SubjectTabs({
     { key: 'other', label: 'Other', count: other.length },
   ].filter((t) => t.key === 'pyq' || t.count > 0 || resources.length === 0);
 
-  const [active, setActive] = useState(TABS[0]?.key ?? 'books');
   const activeKey = TABS.some((t) => t.key === active) ? active : TABS[0]?.key ?? 'books';
 
   return (
