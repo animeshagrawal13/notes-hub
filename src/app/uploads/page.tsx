@@ -1,5 +1,4 @@
 import { auth } from '@/lib/auth';
-import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import PageHeader from '@/components/ui/PageHeader';
 import UploadForm from '@/components/UploadForm';
@@ -13,22 +12,24 @@ export const dynamic = 'force-dynamic';
 
 export default async function UploadsPage() {
   const session = await auth();
-  if (!session?.user) redirect('/login');
 
   const [subjects, uploads] = await Promise.all([
-    prisma.subject.findMany({ orderBy: { name: 'asc' }, include: { units: true } }),
-    prisma.resource.findMany({
-      where: { uploadedById: session.user.id },
-      include: { subject: true, unit: true },
-      orderBy: { createdAt: 'desc' },
-    }),
+    prisma.subject.findMany({ orderBy: { name: 'asc' }, include: { units: { orderBy: { number: 'asc' } } } }),
+    session?.user
+      ? prisma.resource.findMany({
+          where: { uploadedById: session.user.id },
+          include: { subject: true, unit: true },
+          orderBy: { createdAt: 'desc' },
+        })
+      : Promise.resolve(null),
   ]);
 
   return (
     <div className="space-y-8">
-      <PageHeader title="My Uploads" subtitle="Manage your contributions to the library" />
+      <PageHeader title="Contribute Notes" subtitle="Share notes, slides or PYQs with the class — no account needed" />
       <UploadForm subjects={subjects} />
 
+      {uploads && (
       <div className="space-y-4">
         <h2 className="text-card-title font-semibold text-ink">Your uploads ({uploads.length})</h2>
         {uploads.length > 0 ? (
@@ -65,6 +66,7 @@ export default async function UploadsPage() {
           <EmptyState title="No uploads yet" body="Files you share appear here once submitted." Icon={Upload} />
         )}
       </div>
+      )}
     </div>
   );
 }

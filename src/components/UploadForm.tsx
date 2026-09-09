@@ -33,6 +33,7 @@ const YEAR_OPTIONS = Array.from({ length: currentYear - 1989 }, (_, i) => curren
 export default function UploadForm({ subjects }: { subjects: any[] }) {
   const [file, setFile] = useState<File | null>(null);
   const [subjectId, setSubjectId] = useState('');
+  const [unitNumber, setUnitNumber] = useState('');
   const [type, setType] = useState('');
   const [academicYear, setAcademicYear] = useState('');
   const [title, setTitle] = useState('');
@@ -43,6 +44,8 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
   const { toast } = useToast();
 
   const yearRequired = PYQ_LIKE_TYPES.has(type);
+  const selectedSubject = subjects.find((s) => s.id === subjectId);
+  const units: any[] = selectedSubject?.units ?? [];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +65,8 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
     formData.set('subjectId', subjectId);
     formData.set('type', type);
     if (academicYear) formData.set('academicYear', academicYear);
-    if (uploaderName.trim()) formData.set('tags', `uploader:${uploaderName.trim()}`);
+    if (unitNumber) formData.set('unitNumber', unitNumber);
+    formData.set('uploaderName', uploaderName.trim() || 'Anonymous');
 
     setSubmitting(true);
     try {
@@ -75,6 +79,7 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
       toast('Upload received — pending review', 'success');
       setFile(null);
       setSubjectId('');
+      setUnitNumber('');
       setType('');
       setAcademicYear('');
       setTitle('');
@@ -113,7 +118,14 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
             <label className="block text-meta font-medium mb-1">
               Subject <span className="text-danger">*</span>
             </label>
-            <Select value={subjectId} onChange={(e) => setSubjectId(e.target.value)} required>
+            <Select
+              value={subjectId}
+              onChange={(e) => {
+                setSubjectId(e.target.value);
+                setUnitNumber('');
+              }}
+              required
+            >
               <option value="">Select subject</option>
               {subjects.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -136,6 +148,23 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
             </Select>
           </div>
         </div>
+
+        {units.length > 0 && (
+          <div>
+            <label className="block text-meta font-medium mb-1">Unit / Chapter</label>
+            <Select value={unitNumber} onChange={(e) => setUnitNumber(e.target.value)}>
+              <option value="">Not sure / covers multiple units</option>
+              {units.map((u: any) => (
+                <option key={u.number} value={u.number}>
+                  Unit {u.number} — {u.title}
+                </option>
+              ))}
+            </Select>
+            <p className="mt-1.5 text-micro text-muted">
+              Optional, but picking the right chapter means students find this instantly instead of digging through "Other".
+            </p>
+          </div>
+        )}
 
         {yearRequired && (
           <div>

@@ -15,7 +15,17 @@ export type NoteRowData = {
   subject?: { id: string; name: string } | null;
   unit?: { number: number; title: string } | null;
   uploadedBy?: { name: string | null } | null;
+  tags?: string | null;
 };
+
+// Anonymous uploads store the person's typed name as "uploader:Name" in
+// tags (there's no account to read a real name off of) — prefer that over
+// the shared system account's name when it's present.
+export function uploaderDisplayName(note: Pick<NoteRowData, "tags" | "uploadedBy">): string {
+  const match = note.tags?.match(/(?:^|,)\s*uploader:([^,]+)/i);
+  const name = match?.[1]?.trim();
+  return name || note.uploadedBy?.name || "—";
+}
 
 const FILE_ICON: Record<string, LucideIcon> = {
   PDF: FileText,
@@ -98,7 +108,7 @@ export default function NoteListItem({
           </span>
         )}
         <span className="hidden w-[150px] shrink-0 truncate text-meta text-secondary lg:block">
-          {middleColumn === "subject" ? note.subject?.name ?? "—" : note.uploadedBy?.name ?? "—"}
+          {middleColumn === "subject" ? note.subject?.name ?? "—" : uploaderDisplayName(note)}
         </span>
         {trailing}
         {bookmarked !== undefined && (
