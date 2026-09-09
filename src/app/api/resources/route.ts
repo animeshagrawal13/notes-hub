@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { saveUploadedFile, UploadValidationError } from "@/lib/upload";
+import { saveUploadedFile, UploadValidationError, hashFile } from "@/lib/upload";
 
 // SGSITS NotesVault has no accounts for browsing or uploading — this is the
 // system account real anonymous submissions attach to (the FK still needs a
@@ -50,6 +50,20 @@ export async function POST(req: NextRequest) {
   const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
   if (!subject) return NextResponse.json({ error: "Subject not found." }, { status: 404 });
 
+  // Same file (byte-for-byte), same subject, already here — tell the
+  // uploader instead of silently doubling the library.
+  const fileHash = await hashFile(file);
+  const duplicate = await prisma.resource.findFirst({
+    where: { subjectId, fileHash },
+    select: { id: true, title: true },
+  });
+  if (duplicate) {
+    return NextResponse.json(
+      { error: `This file is already on the site as "${duplicate.title}". No need to upload it again.`, duplicateId: duplicate.id },
+      { status: 409 },
+    );
+  }
+
   let saved;
   try {
     saved = await saveUploadedFile(file, subject.code.toLowerCase());
@@ -80,6 +94,7 @@ export async function POST(req: NextRequest) {
       fileUrl: saved.fileUrl,
       fileType: saved.fileType,
       fileSize: saved.fileSize,
+      fileHash,
       tags,
       type,
       academicYear,

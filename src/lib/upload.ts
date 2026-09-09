@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID, createHash } from "crypto";
 import { put, del } from "@vercel/blob";
 import path from "path";
 
@@ -10,9 +10,22 @@ const ALLOWED_TYPES = new Set([
   "image/jpeg",
 ]);
 
-const MAX_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
+// Vercel Blob's free tier is 1GB total — a 50MB cap let a handful of
+// uploads eat a big chunk of that. Lowered to keep the library sustainable;
+// a properly scanned/exported PDF for a semester's notes rarely needs more
+// than this. (True server-side re-compression would need native binaries
+// — poppler/ghostscript — that aren't available in a Vercel serverless
+// function without a much heavier custom runtime, so this cap is the real,
+// deployable lever here rather than promising silent recompression.)
+const MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15MB
 
 export class UploadValidationError extends Error {}
+
+/** sha256 of the file's bytes — used to catch the same file uploaded twice. */
+export async function hashFile(file: File): Promise<string> {
+  const buf = Buffer.from(await file.arrayBuffer());
+  return createHash("sha256").update(buf).digest("hex");
+}
 
 /**
  * Runtime uploads (made after launch) go straight to Vercel Blob — the

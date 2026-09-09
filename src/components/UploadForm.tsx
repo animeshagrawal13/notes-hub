@@ -8,24 +8,19 @@ import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/Toast';
 import Card from '@/components/ui/Card';
 
-// Same canonical set the rest of the site buckets resources into
-// (SubjectTabs' Books/Notes/Class Slides/PYQs/Other) — every option here
-// lands somewhere real, nothing falls into an unlabeled catch-all.
+// Kept deliberately narrow to what students actually upload — matches the
+// site's own Notes / Class Slides / PYQ (MST & End-Semester) tabs exactly,
+// so nothing anyone submits can land somewhere confusing. MST and
+// End-Semester both save as the same PYQ type (that's all the schema
+// needs) — the option just seeds the title so it auto-sorts into the right
+// PYQ sub-section like every other paper on the site.
 const TYPE_OPTIONS = [
   { value: 'NOTES', label: 'Notes' },
-  { value: 'HANDWRITTEN_NOTES', label: 'Handwritten Notes' },
   { value: 'SLIDES', label: 'Class Slides' },
-  { value: 'PYQ', label: 'PYQ — Previous Year Question Paper' },
-  { value: 'QUESTION_BANK', label: 'Question Bank' },
-  { value: 'IMPORTANT_QUESTIONS', label: 'Important Questions' },
-  { value: 'REFERENCE_MATERIAL', label: 'Reference / Book' },
-  { value: 'ASSIGNMENT', label: 'Assignment' },
-  { value: 'PRACTICAL', label: 'Practical' },
-  { value: 'LAB_MANUAL', label: 'Lab Manual' },
-  { value: 'SYLLABUS', label: 'Syllabus' },
-  { value: 'CHEAT_SHEET', label: 'Cheat Sheet' },
+  { value: 'PYQ_MST', label: 'PYQ — MST', dbType: 'PYQ', titleHint: 'MST' },
+  { value: 'PYQ_ENDSEM', label: 'PYQ — End-Semester', dbType: 'PYQ', titleHint: 'End-Semester' },
 ];
-const PYQ_LIKE_TYPES = new Set(['PYQ', 'QUESTION_BANK', 'IMPORTANT_QUESTIONS']);
+const PYQ_LIKE_TYPES = new Set(['PYQ_MST', 'PYQ_ENDSEM']);
 
 const currentYear = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: currentYear - 1989 }, (_, i) => currentYear + 1 - i);
@@ -59,11 +54,21 @@ export default function UploadForm({ subjects }: { subjects: any[] }) {
       return setError('Enter the exam year — required for PYQs / question banks so search-by-year works.');
     }
 
+    const typeOption = TYPE_OPTIONS.find((t) => t.value === type);
+    const dbType = typeOption?.dbType ?? type;
+    // If the title doesn't already say MST/End-Semester, seed it — that's
+    // the exact signal SubjectTabs uses to sort a PYQ into the right
+    // sub-section, so this keeps every upload consistent automatically.
+    let finalTitle = title.trim();
+    if (typeOption?.titleHint && !/\bmst\b|end[\s-]?sem/i.test(finalTitle)) {
+      finalTitle = `${finalTitle} — ${typeOption.titleHint}`;
+    }
+
     const formData = new FormData();
     formData.set('file', file);
-    formData.set('title', title.trim());
+    formData.set('title', finalTitle);
     formData.set('subjectId', subjectId);
-    formData.set('type', type);
+    formData.set('type', dbType);
     if (academicYear) formData.set('academicYear', academicYear);
     if (unitNumber) formData.set('unitNumber', unitNumber);
     formData.set('uploaderName', uploaderName.trim() || 'Anonymous');
