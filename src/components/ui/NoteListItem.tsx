@@ -50,6 +50,7 @@ export default function NoteListItem({
   snippet,
   middleColumn = "uploader",
   className,
+  hideType,
 }: {
   note: NoteRowData;
   variant?: "row" | "table";
@@ -62,6 +63,8 @@ export default function NoteListItem({
   /** table variant only — what the 150px column shows */
   middleColumn?: "uploader" | "subject";
   className?: string;
+  /** table variant only — omit the Type badge column */
+  hideType?: boolean;
 }) {
   const Icon = fileIcon(note.fileType);
   const hover =
@@ -89,9 +92,11 @@ export default function NoteListItem({
             <span className="mt-1 block truncate text-micro italic text-text-faint">{snippet}</span>
           )}
         </span>
-        <span className="hidden w-[112px] shrink-0 sm:block">
-          <TypeBadge type={note.type} />
-        </span>
+        {!hideType && (
+          <span className="hidden w-[112px] shrink-0 sm:block">
+            <TypeBadge type={note.type} />
+          </span>
+        )}
         <span className="hidden w-[150px] shrink-0 truncate text-meta text-secondary lg:block">
           {middleColumn === "subject" ? note.subject?.name ?? "—" : note.uploadedBy?.name ?? "—"}
         </span>

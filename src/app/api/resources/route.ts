@@ -15,9 +15,25 @@ export async function POST(req: NextRequest) {
   const unitNumber = form.get("unitNumber") as string | null;
   const type = form.get("type") as string | null;
   const tags = (form.get("tags") as string | null) ?? "";
+  const academicYearRaw = form.get("academicYear") as string | null;
 
   if (!file || !title || !subjectId || !type) {
     return NextResponse.json({ error: "File, title, subject and resource type are required." }, { status: 400 });
+  }
+
+  // A PYQ with no year attached is useless for "search by year" — required
+  // for the exam-paper types, optional (but accepted) for everything else.
+  const PYQ_LIKE_TYPES = new Set(["PYQ", "QUESTION_BANK", "IMPORTANT_QUESTIONS"]);
+  let academicYear: number | null = null;
+  if (academicYearRaw) {
+    const n = parseInt(academicYearRaw, 10);
+    if (!Number.isNaN(n) && n >= 1990 && n <= new Date().getFullYear() + 1) academicYear = n;
+  }
+  if (PYQ_LIKE_TYPES.has(type) && !academicYear) {
+    return NextResponse.json(
+      { error: "Exam year is required for a previous year question paper / question bank." },
+      { status: 400 },
+    );
   }
 
   const subject = await prisma.subject.findUnique({ where: { id: subjectId } });
@@ -55,6 +71,7 @@ export async function POST(req: NextRequest) {
       fileSize: saved.fileSize,
       tags,
       type,
+      academicYear,
       status: "PENDING",
       subjectId,
       unitId,

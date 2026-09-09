@@ -122,13 +122,13 @@ function ChapterSections({
     // Chapter grouping is a display nicety, never worth a blank page over —
     // fall back to the flat list if it ever throws on some odd title/data shape.
     console.error('Chapter grouping failed:', err);
-    return <NoteListTable notes={items} bookmarkedIds={bookmarkedIds} />;
+    return <NoteListTable notes={items} bookmarkedIds={bookmarkedIds} hideType />;
   }
 
   // No syllabus units for this subject, or nothing matched any chapter —
   // just show the flat list rather than a pile of empty sub-headers.
   if (chapters.length === 0 && complete.length === 0) {
-    return <NoteListTable notes={items} bookmarkedIds={bookmarkedIds} />;
+    return <NoteListTable notes={items} bookmarkedIds={bookmarkedIds} hideType />;
   }
 
   return (
@@ -141,19 +141,19 @@ function ChapterSections({
             </span>
             {c.title}
           </h3>
-          <NoteListTable notes={c.items} bookmarkedIds={bookmarkedIds} />
+          <NoteListTable notes={c.items} bookmarkedIds={bookmarkedIds} hideType />
         </section>
       ))}
       {leftover.length > 0 && (
         <section className="space-y-3">
           <h3 className="text-card-title font-semibold text-ink">Other</h3>
-          <NoteListTable notes={leftover} bookmarkedIds={bookmarkedIds} />
+          <NoteListTable notes={leftover} bookmarkedIds={bookmarkedIds} hideType />
         </section>
       )}
       {complete.length > 0 && (
         <section className="space-y-3">
           <h3 className="text-card-title font-semibold text-ink">Complete Notes</h3>
-          <NoteListTable notes={complete} bookmarkedIds={bookmarkedIds} />
+          <NoteListTable notes={complete} bookmarkedIds={bookmarkedIds} hideType />
         </section>
       )}
     </div>
@@ -207,7 +207,7 @@ export default function SubjectTabs({
       <Tabs tabs={TABS} active={activeKey} onChange={setActive} />
 
       {activeKey === 'books' && (
-        <NoteListTable notes={books} bookmarkedIds={bookmarkedIds} emptyTitle="No books yet" />
+        <NoteListTable notes={books} bookmarkedIds={bookmarkedIds} emptyTitle="No books yet" hideType />
       )}
 
       {activeKey === 'notes' && (
@@ -224,26 +224,26 @@ export default function SubjectTabs({
           {mstPyqs.length > 0 && (
             <section className="space-y-3">
               <h3 className="text-card-title font-semibold text-ink">MST</h3>
-              <NoteListTable notes={mstPyqs} bookmarkedIds={bookmarkedIds} />
+              <NoteListTable notes={mstPyqs} bookmarkedIds={bookmarkedIds} hideType />
             </section>
           )}
           {endSemPyqs.length > 0 && (
             <section className="space-y-3">
               <h3 className="text-card-title font-semibold text-ink">End-Semester</h3>
-              <NoteListTable notes={endSemPyqs} bookmarkedIds={bookmarkedIds} />
+              <NoteListTable notes={endSemPyqs} bookmarkedIds={bookmarkedIds} hideType />
             </section>
           )}
           {otherPyqs.length > 0 && (
             <section className="space-y-3">
               <h3 className="text-card-title font-semibold text-ink">Sample &amp; Other Papers</h3>
-              <NoteListTable notes={otherPyqs} bookmarkedIds={bookmarkedIds} />
+              <NoteListTable notes={otherPyqs} bookmarkedIds={bookmarkedIds} hideType />
             </section>
           )}
         </div>
       )}
 
       {activeKey === 'other' && (
-        <NoteListTable notes={other} bookmarkedIds={bookmarkedIds} emptyTitle="Nothing else here" />
+        <NoteListTable notes={other} bookmarkedIds={bookmarkedIds} emptyTitle="Nothing else here" hideType />
       )}
     </div>
   );
