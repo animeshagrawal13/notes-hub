@@ -118,12 +118,11 @@ function ChapterSections({
   let chapters, leftover, complete;
   try {
     ({ chapters, leftover, complete } = groupByChapter(items, units));
-  } catch (err: any) {
-    return (
-      <pre style={{ whiteSpace: 'pre-wrap', padding: 20, fontSize: 12 }}>
-        {'TEMP-DEBUG(chapters): ' + (err?.message || String(err)) + '\n' + (err?.stack || '')}
-      </pre>
-    );
+  } catch (err) {
+    // Chapter grouping is a display nicety, never worth a blank page over —
+    // fall back to the flat list if it ever throws on some odd title/data shape.
+    console.error('Chapter grouping failed:', err);
+    return <NoteListTable notes={items} bookmarkedIds={bookmarkedIds} />;
   }
 
   // No syllabus units for this subject, or nothing matched any chapter —
@@ -174,18 +173,19 @@ export default function SubjectTabs({
 
   let units: { number: number; title: string }[] = [];
   let books: any[] = [], notes: any[] = [], slides: any[] = [], pyqs: any[] = [], other: any[] = [];
-  let debugError: string | null = null;
+  let bucketingFailed = false;
   try {
     units = (subject.units || []).map((u: any) => ({ number: u.number, title: u.title }));
     const buckets = { books: [] as any[], notes: [] as any[], slides: [] as any[], pyq: [] as any[], other: [] as any[] };
     for (const r of resources) buckets[bucketOf(r)].push(r);
     ({ books, notes, slides, pyq: pyqs, other } = buckets);
-  } catch (err: any) {
-    debugError = 'TEMP-DEBUG: ' + (err?.message || String(err)) + '\n' + (err?.stack || '');
+  } catch (err) {
+    console.error('Resource bucketing failed:', err);
+    bucketingFailed = true;
   }
 
-  if (debugError) {
-    return <pre style={{ whiteSpace: 'pre-wrap', padding: 20, fontSize: 12 }}>{debugError}</pre>;
+  if (bucketingFailed) {
+    return <NoteListTable notes={resources} bookmarkedIds={bookmarkedIds} emptyTitle="No resources yet" />;
   }
 
   const mstPyqs = pyqs.filter((r) => isMst(r.title));
