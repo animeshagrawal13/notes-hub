@@ -38,7 +38,9 @@ export default function TeamAvatar({ slug, name }: { slug: string; name: string 
           alt={`${name}, co-creator of SGSITS NotesVault`}
           width={120}
           height={120}
-          className="h-full w-full object-cover"
+          // Bias the crop toward the top so an uncropped standing photo still
+          // frames the face, not the torso.
+          className="h-full w-full object-cover object-[center_18%]"
         />
       ) : (
         <svg viewBox="0 0 120 120" role="img" aria-label={`Portrait of ${name} not yet added`} className="h-full w-full">
