@@ -54,3 +54,4 @@ prisma/dev.db.bak-*
 
 __pycache__/
 *.pyc
+.env.prod.local
