@@ -74,7 +74,7 @@ async function main() {
       const titleResult = scoreAgainstVocab(r.title, vocab);
       let unit = null;
       let via = "";
-      if (titleResult.best >= 0 && titleResult.score >= 2) {
+      if (titleResult.best >= 0 && titleResult.score >= 1) {
         unit = subject.units[titleResult.best];
         via = `title, score=${titleResult.score}`;
       } else {

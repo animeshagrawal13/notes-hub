@@ -6,11 +6,11 @@
 // own short title ("Digital Electronics").
 export const UNIT_VOCAB: Record<string, string[][]> = {
   MA10021: [
-    ["Baudhayana", "Aryabhata", "Brahmagupta", "Bhaskara", "Madhava", "Ramanujan", "Bhatnagar", "Chandra", "partial derivatives", "Jacobians", "Taylor", "Maclaurin", "maxima", "minima"],
-    ["Beta", "Gamma", "multiple integrals", "double integrals", "change of order", "change of variables"],
-    ["rank", "echelon", "normal form", "inverse", "Gauss-Jordan", "linear equations", "eigen values", "eigen vectors", "Cayley-Hamilton"],
-    ["ordinary differential equations", "linear differential equations", "variation of parameters"],
-    ["fuzzy sets", "membership functions", "crisp sets", "normality", "convexity", "union", "intersection", "complement"],
+    ["Baudhayana", "Aryabhata", "Brahmagupta", "Bhaskara", "Madhava", "Ramanujan", "Bhatnagar", "Chandra", "Indian mathematicians", "partial derivatives", "Jacobians", "Taylor", "Maclaurin", "maxima", "minima", "differential calculus"],
+    ["Beta", "Gamma", "multiple integrals", "double integrals", "change of order", "change of variables", "integral calculus"],
+    ["matrices", "matrix", "rank", "echelon", "normal form", "Gauss-Jordan", "eigen values", "eigen vectors", "eigenvalue", "Cayley-Hamilton"],
+    ["differential equations", "ordinary differential equations", "linear differential equations", "variation of parameters"],
+    ["fuzzy sets", "fuzzy set", "membership functions", "crisp sets", "normality", "convexity"],
   ],
   IT10007: [
     ["information concepts", "digital computer", "hardware", "software", "operating system", "computer networks", "internet", "information security", "IT act", "digital ethics"],
@@ -52,29 +52,29 @@ export const UNIT_VOCAB: Record<string, string[][]> = {
     ["number system", "binary codes", "boolean algebra", "boolean functions", "logic gates", "karnaugh", "k map", "half adder", "full adder", "flip-flop", "flip flop"],
   ],
   HU10512: [
-    ["communication skills", "grammar", "LSRW", "listening", "speaking", "reading", "writing", "SQ3R", "verbal", "nonverbal"],
-    ["project writing", "structure and format"],
+    ["communication skills", "grammar", "linguistics", "LSRW", "listening", "speaking", "reading comprehension", "SQ3R", "verbal", "nonverbal"],
+    ["project writing", "structure and format", "resume", "résumé", "cover letter", "business letter", "letter writing", "enquiry letter", "technical writing"],
     ["oral presentation", "presentation strategies", "audience", "power point"],
   ],
   CE10513: [
-    ["forces", "equilibrium", "concurrent", "co-planer", "free body diagram", "bow's notation", "trusses", "method of joints", "method of sections"],
+    ["forces", "equilibrium", "concurrent", "co-planer", "free body diagram", "bow's notation", "trusses", "truss", "method of joints", "method of sections"],
     ["centroid", "centre of gravity", "moment of inertia", "radius of gyration", "product of inertia"],
     ["beams", "support reaction", "simply supported", "overhanging", "cantilever", "shear force", "bending moment"],
-    ["introduction to civil engineering", "historical perspective", "branches of civil engineering"],
-    ["geomatics", "plane surveying", "chain", "compass", "leveling", "contours", "traverse survey"],
+    ["introduction to civil engineering", "history of civil engineering", "historical perspective", "branches of civil engineering"],
+    ["geomatics", "surveying", "plane surveying", "chain surveying", "compass surveying", "leveling", "contours", "traverse"],
   ],
   PY10514: [
-    ["origin of life", "cell structure", "biomolecules", "proteins", "nucleic acids", "lipids", "carbohydrates", "enzymes", "amylase", "protease", "cellulase"],
-    ["DNA structure", "replication", "central dogma", "transcription", "translation", "genetic code", "mutations", "recombinant DNA", "CRISPR"],
-    ["microbiology", "bacteria", "virus", "fungi", "fermentation", "biofuels", "probiotics", "biosafety", "sterilization"],
-    ["human physiology", "nervous system", "cardiovascular", "respiratory", "tissue engineering", "biomedical devices", "biomaterials"],
-    ["biomimicry", "gecko", "shark-skin", "systems biology", "synthetic biology", "bio-robots", "bio-inspired", "DNA computing"],
+    ["origin of life", "cell structure", "biomolecules", "biomolecule", "proteins", "nucleic acids", "lipids", "carbohydrates", "enzymes", "enzyme", "amylase", "protease", "cellulase"],
+    ["genetics", "molecular biology", "DNA structure", "DNA replication", "central dogma", "transcription", "translation", "genetic code", "mutations", "recombinant DNA", "CRISPR"],
+    ["microbiology", "bacteria", "bacteriology", "bacterial", "virus", "fungi", "fermentation", "biofuels", "probiotics", "biosafety", "sterilization", "micro-organisms", "microorganisms"],
+    ["human physiology", "nervous system", "cardiovascular", "respiratory", "circulatory", "tissue engineering", "biomedical devices", "biomaterials"],
+    ["biomimicry", "biomimetic", "bioinspired", "bio-inspired", "gecko", "shark-skin", "systems biology", "synthetic biology", "bio-robots", "DNA computing"],
   ],
   IP10584: [
     ["design thinking", "innovation", "mind mapping", "project selection", "brainstorming"],
     ["ideation", "lateral thinking", "synectics", "analogical thinking", "concept evaluation", "prototyping"],
-    ["woodworking", "carpentry", "timber", "plywood", "foundry", "moulding", "casting", "pattern"],
-    ["forging", "hammers", "anvil", "welding", "electrode", "arc welding", "gas welding", "oxyacetylene"],
+    ["woodworking", "wood working", "carpentry", "timber", "plywood", "foundry", "moulding", "casting", "pattern"],
+    ["forging", "forge", "hammers", "anvil", "welding", "weld", "electrode", "arc welding", "gas welding", "oxyacetylene"],
     ["machining", "lathe", "drill", "shaper", "planer", "cutting tool", "fitting", "micrometer", "vernier", "hacksaw"],
   ],
 };
