@@ -15,9 +15,9 @@ export const dynamic = 'force-dynamic';
 const REASONS = [
   {
     Icon: BookOpen,
-    title: 'The right material, in time',
+    title: 'Everything for the subject, together',
     body:
-      'The biggest problem before an exam is rarely effort — it is not finding correct, complete material when it matters. NotesVault exists to solve exactly that.',
+      'Notes, class slides and previous year papers for a subject sit on one page — no hunting across chats, drives and seniors’ phones the night before.',
   },
   {
     Icon: FolderTree,
