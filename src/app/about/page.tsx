@@ -55,17 +55,17 @@ const TEAM = [
   {
     slug: 'viral-sharma',
     name: 'Viral Sharma',
-    subtitle: '2nd Year IT Student',
-    role: 'Idea & Frontend',
-    body: 'Came up with the idea and builds the frontend. Enjoys turning ideas into simple, clean and useful interfaces.',
+    subtitle: 'B.Tech IT · SGSITS Indore',
+    role: 'Concept & Frontend',
+    body: 'Shaped the original idea and owns the interface — focused on making every page fast, clear, and something a student can use without a second thought.',
     socials: null as null | { linkedin?: string; instagram?: string },
   },
   {
     slug: 'animesh-agrawal',
     name: 'Animesh Agrawal',
-    subtitle: '2nd Year IT Student',
-    role: 'Backend',
-    body: 'Handles the backend and keeps everything running smoothly. Believes in building useful things that make student life easier.',
+    subtitle: 'B.Tech IT · SGSITS Indore',
+    role: 'Backend & Data',
+    body: 'Builds and maintains the backend — the database, the upload pipeline, and the syllabus-aware structure that keeps every file in the right place.',
     socials: {
       linkedin: 'https://www.linkedin.com/in/animeshagrawal13',
       instagram: 'https://www.instagram.com/_animesh_agrawal_',
@@ -142,10 +142,11 @@ export default async function AboutPage() {
           </h1>
           <span aria-hidden className="mt-6 block h-[3px] w-24 rounded-full bg-sage-300" />
           <p className="mt-6 max-w-md text-body-lg leading-relaxed text-secondary">
-            Every student knows the feeling: the exam is close, and the notes that actually cover the
-            syllabus are scattered across a dozen chats and drives. SGSITS NotesVault brings the
-            notes, class slides and previous year papers for every first-year subject into one
-            place — organised by subject and unit, open to everyone, with no account needed.
+            The single biggest problem students face before an exam is finding the correct, complete
+            study material in time — it ends up scattered across a dozen chats and drives. SGSITS
+            NotesVault exists to solve that one problem: the notes, class slides and previous year
+            papers for every first-year subject, in one place, organised by subject and syllabus
+            unit, open to everyone, with no account needed.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
@@ -206,9 +207,20 @@ export default async function AboutPage() {
         </div>
       </section>
 
+      {/* ── The problem, stated plainly ──────────────────────────────────── */}
+      <section aria-label="The problem this solves" className="border-l-2 border-sage-300 pl-5 sm:pl-7">
+        <p className="max-w-2xl font-heading text-[clamp(1.25rem,3vw,1.7rem)] font-semibold leading-snug tracking-[-0.01em] text-ink">
+          The biggest problem before an exam isn&rsquo;t effort — it&rsquo;s not being able to find
+          the right material in time.
+        </p>
+        <p className="mt-3 max-w-2xl text-body leading-relaxed text-secondary">
+          That is the only problem this website is built to solve. Everything below follows from it.
+        </p>
+      </section>
+
       {/* ── Why we built this ────────────────────────────────────────────── */}
       <section aria-labelledby="why-heading">
-        <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">Why it exists</p>
+        <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">How it answers that</p>
         <h2
           id="why-heading"
           className="mt-3 text-[clamp(1.5rem,3.4vw,2.05rem)] font-heading font-bold leading-tight tracking-[-0.02em] text-ink"
