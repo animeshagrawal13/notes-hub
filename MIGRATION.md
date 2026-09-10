@@ -1,4 +1,30 @@
-# Vercel Blob → GitHub + jsDelivr migration (in progress)
+# Vercel Blob → GitHub migration
+
+## STATUS (2026-09-10) — 201 of 338 files live, free, same URL
+
+- **jsDelivr was abandoned**: it has a hard 50 MB per-repo cap; the files repo
+  is ~577 MB. Files are served from **raw.githubusercontent.com** instead
+  (`Access-Control-Allow-Origin: *`, works with the PDF.js reader — verified
+  on the live site).
+- 201 files recovered (git history + Google Drive), compressed, pushed to
+  `github.com/animeshagrawal13/notes-hub-files@main`. Their `resource.fileUrl`
+  rows now point at `raw.githubusercontent.com/.../main/<path>`.
+- **137 files could not be recovered for free** — they exist only in the
+  blocked Blob store (no copy in git history, not in the Drive folders).
+  Their `fileUrl` rows were left on the Blob host; they self-recover when the
+  store unblocks **2026-10-10**. Re-run step 1/2 tooling after that date, or
+  have students re-upload.
+- `src/lib/upload.ts` rewired: new uploads commit into `notes-hub-files` via
+  the GitHub Contents API. **ACTION NEEDED:** add `GITHUB_FILES_TOKEN` (a PAT
+  with `contents: write` on `notes-hub-files`) to the Vercel project env, or
+  uploads will fail with a clear "storage not configured" message.
+- To finish the last 137 after 2026-10-10: get `BLOB_READ_WRITE_TOKEN`, run a
+  `list()` + download loop against the (unblocked) store into
+  `notes-hub-files`, push, then re-run `scripts/_rewrite-fileurls.ts --apply`.
+
+---
+
+# Original plan (jsDelivr — superseded, kept for reference)
 
 **Why:** Vercel Blob store `fr0cg5ys41r4psru` is blocked (10 GB/mo transfer cap hit).
 Access auto-resumes 2026-10-10. Goal: move all PDFs to a free public GitHub repo
