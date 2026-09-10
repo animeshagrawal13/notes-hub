@@ -56,16 +56,16 @@ const TEAM = [
     slug: 'viral-sharma',
     name: 'Viral Sharma',
     subtitle: 'B.Tech IT · SGSITS Indore',
-    role: 'Concept & Frontend',
-    body: 'Shaped the original idea and owns the interface — focused on making every page fast, clear, and something a student can use without a second thought.',
+    role: 'Co-founder · Product & Frontend',
+    body: 'Had the original idea after one too many pre-exam scrambles for notes, and owns the product side — the layout, the flow, and the design system. His rule for every screen: a student under exam pressure should never have to think about how to use it.',
     socials: null as null | { linkedin?: string; instagram?: string },
   },
   {
     slug: 'animesh-agrawal',
     name: 'Animesh Agrawal',
     subtitle: 'B.Tech IT · SGSITS Indore',
-    role: 'Backend & Data',
-    body: 'Builds and maintains the backend — the database, the upload pipeline, and the syllabus-aware structure that keeps every file in the right place.',
+    role: 'Co-founder · Backend & Data',
+    body: 'Built and runs everything behind the page — the database, the file-upload pipeline, search, and the syllabus-aware structure that files every note under the correct subject and unit. Also curated the initial library, subject by subject, against the official syllabus.',
     socials: {
       linkedin: 'https://www.linkedin.com/in/animeshagrawal13',
       instagram: 'https://www.instagram.com/_animesh_agrawal_',
@@ -273,13 +273,19 @@ export default async function AboutPage() {
       <section aria-labelledby="team-heading">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">Built by students</p>
+            <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">The founders</p>
             <h2
               id="team-heading"
               className="mt-3 text-[clamp(1.5rem,3.4vw,2.05rem)] font-heading font-bold leading-tight tracking-[-0.02em] text-ink"
             >
-              The people behind SGSITS NotesVault.
+              Two classmates who were tired of the exam-week scramble.
             </h2>
+            <p className="mt-4 max-w-xl text-body leading-relaxed text-secondary">
+              SGSITS NotesVault was started by two first-year IT students at SGSITS Indore. It began
+              as a shared folder for their own batch and grew into a proper, syllabus-organised
+              library once it was clear how much time it was saving everyone. It is built and run
+              entirely by the two of them, in their own time, for their college.
+            </p>
           </div>
 
           <div aria-hidden className="hidden items-end gap-2 pb-1 lg:flex">
