@@ -5,24 +5,27 @@ import TeamAvatar from '@/components/about/TeamAvatar';
 export const metadata: Metadata = {
   title: 'About · SGSITS NotesVault',
   description:
-    'SGSITS NotesVault is a student-made platform bringing college notes, PYQs and learning resources into one place — no accounts, no unnecessary barriers.',
+    'SGSITS NotesVault solves the one problem every student runs into before an exam — finding the right study material in time. Notes, class slides and PYQs for every first-year subject, in one place, with no accounts.',
 };
 
 const REASONS = [
   {
     Icon: BookOpen,
-    title: 'Everything in one place',
-    body: 'Find the notes, PYQs and resources you need, organized by subject and semester.',
+    title: 'The right material, in time',
+    body:
+      'The single biggest problem students face before an exam is not a lack of effort — it is not being able to find the correct, complete material when it matters. NotesVault exists to solve exactly that.',
   },
   {
     Icon: Users,
-    title: 'A more open community',
-    body: 'A shared space where everyone can access, contribute and learn together.',
+    title: 'Organised the way you revise',
+    body:
+      'Everything is sorted by subject and by syllabus unit — Notes, Class Slides and PYQs (MST and End-Semester) — so you reach the exact chapter you need without scrolling through a shared drive.',
   },
   {
     Icon: Leaf,
-    title: 'No unnecessary barriers',
-    body: 'No logins. No profiles. Just open access to knowledge — for every student.',
+    title: 'No barriers, no gatekeeping',
+    body:
+      'No logins, no profiles, no waiting for approval. Anyone can browse, and anyone can contribute a file back to the class in seconds.',
   },
 ];
 
@@ -33,6 +36,7 @@ const TEAM = [
     subtitle: '2nd Year IT Student',
     role: 'Idea & Frontend',
     body: 'Came up with the idea and builds the frontend. Enjoys turning ideas into simple, clean and useful interfaces.',
+    socials: null as null | { linkedin?: string; instagram?: string },
   },
   {
     slug: 'animesh-agrawal',
@@ -40,8 +44,47 @@ const TEAM = [
     subtitle: '2nd Year IT Student',
     role: 'Backend',
     body: 'Handles the backend and keeps everything running smoothly. Believes in building useful things that make student life easier.',
+    socials: {
+      linkedin: 'https://www.linkedin.com/in/animeshagrawal13',
+      instagram: 'https://www.instagram.com/_animesh_agrawal_',
+    },
   },
 ];
+
+function SocialLinks({ linkedin, instagram }: { linkedin?: string; instagram?: string }) {
+  return (
+    <div className="mt-3 flex items-center gap-2.5">
+      {linkedin && (
+        <a
+          href={linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Animesh Agrawal on LinkedIn"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-100 text-sage-700 transition hover:bg-sage-200 hover:text-sage-800"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
+            <path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM7.12 20.45H3.55V9h3.57v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.21 0 22.23 0z" />
+          </svg>
+        </a>
+      )}
+      {instagram && (
+        <a
+          href={instagram}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Animesh Agrawal on Instagram"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-100 text-sage-700 transition hover:bg-sage-200 hover:text-sage-800"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" aria-hidden>
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <circle cx="12" cy="12" r="4" />
+            <circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none" />
+          </svg>
+        </a>
+      )}
+    </div>
+  );
+}
 
 export default function AboutPage() {
   return (
@@ -51,17 +94,16 @@ export default function AboutPage() {
         <div>
           <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">About us</p>
           <h1 className="mt-4 text-[clamp(2.1rem,5.4vw,3.1rem)] font-heading font-bold leading-[1.08] tracking-[-0.025em] text-ink">
-            Your college
+            The right material,
             <br />
-            notes, without
-            <br />
-            the extra steps.
+            before the exam.
           </h1>
           <span aria-hidden className="mt-6 block h-[3px] w-24 rounded-full bg-sage-300" />
           <p className="mt-6 max-w-md text-body-lg leading-relaxed text-secondary">
-            SGSITS NotesVault is a student-made platform to bring all college notes, PYQs and learning
-            resources into one place. No accounts, no unnecessary barriers — just open access for
-            everyone.
+            Every student knows the feeling: the exam is close, and the notes that actually cover the
+            syllabus are scattered across a dozen chats and drives. SGSITS NotesVault brings the
+            notes, class slides and previous year papers for every first-year subject into one place —
+            organised by subject and unit, open to everyone, with no account needed.
           </p>
         </div>
 
@@ -178,6 +220,7 @@ export default function AboutPage() {
                   {p.role}
                 </span>
                 <p className="mt-3 text-body leading-relaxed text-secondary">{p.body}</p>
+                {p.socials && <SocialLinks linkedin={p.socials.linkedin} instagram={p.socials.instagram} />}
               </div>
             </div>
           ))}
@@ -186,6 +229,26 @@ export default function AboutPage() {
         {/* the annotation again, where it fits on narrow screens */}
         <p aria-hidden className="mt-8 text-center font-hand text-[19px] leading-tight text-sage-700 lg:hidden">
           Same classroom. Same goal.
+        </p>
+      </section>
+
+      {/* ── A note to the reader ─────────────────────────────────────────── */}
+      <section aria-labelledby="note-heading">
+        <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">A note to the reader</p>
+        <h2
+          id="note-heading"
+          className="mt-3 text-[clamp(1.5rem,3.4vw,2.05rem)] font-heading font-bold leading-tight tracking-[-0.02em] text-ink"
+        >
+          A resource is only as good as the class that keeps it alive.
+        </h2>
+        <span aria-hidden className="mt-4 block h-[3px] w-16 rounded-full bg-sage-300" />
+        <p className="mt-6 max-w-2xl text-body-lg leading-relaxed text-secondary">
+          Our suggestion is a simple one: treat this platform as shared property, not a service. The
+          few minutes it takes to upload a clean set of notes, a corrected question paper or a
+          missing unit are minutes that save the entire batch hours during exam week. If you notice a
+          file that is mislabelled, incomplete or filed under the wrong chapter, flag it or replace
+          it — accuracy here is a collective responsibility, and the library gets better every time
+          someone contributes back to it.
         </p>
       </section>
 
