@@ -533,3 +533,24 @@ html.force-reduced-motion *::after {
   font-family: var(--font-hand), "Segoe Script", "Bradley Hand", cursive;
   letter-spacing: 0.01em;
 }
+
+/* Gentle floating motion for /about's decorative doodle elements — a slow,
+   small drift, never a bounce. Disabled entirely under reduced motion. */
+@keyframes doodle-float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-2deg);
+  }
+}
+
+.animate-doodle-float {
+  animation: doodle-float 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-doodle-float {
+    animation: none;
+  }
+}
