@@ -1,5 +1,23 @@
 # Vercel Blob → GitHub migration
 
+## STATUS (2026-09-13) — 293 of 338 files live, free, same URL; 45 hidden until Oct 10
+
+- Crawled every Drive folder the user provided (fixed a folder/file
+  detection bug in the crawler that had silently dropped items with no
+  visible extension in their Drive display name) — 344 files found.
+- Matched 92 more against the missing set (token-overlap scoring, folder
+  category hints, textbook/reference-book folders excluded outright), pushed
+  to `notes-hub-files`, rewrote their `resource.fileUrl`.
+- **293/338 total now permanently free and live.**
+- The remaining **45** have no copy anywhere reachable for free (checked:
+  git history, all provided Drive folders, this chat). Their resources were
+  set to `status: "UNAVAILABLE"` (see `scripts/_hide-unrecoverable.ts`) so
+  they don't appear anywhere on the site as dead links. Reversible: flip
+  back to `APPROVED` once recovered (Oct 10 Blob unblock, or a fresh
+  re-upload of the same file creates a new APPROVED row automatically).
+
+---
+
 ## STATUS (2026-09-10) — 201 of 338 files live, free, same URL
 
 - **jsDelivr was abandoned**: it has a hard 50 MB per-repo cap; the files repo
