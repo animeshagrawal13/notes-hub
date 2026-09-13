@@ -26,11 +26,18 @@ function findAvatar(slug: string): string | null {
   return null;
 }
 
-export default function TeamAvatar({ slug, name }: { slug: string; name: string }) {
+export default function TeamAvatar({ slug, name, size }: { slug: string; name: string; size?: number }) {
   const src = findAvatar(slug);
 
   return (
-    <div className="h-[104px] w-[104px] shrink-0 overflow-hidden rounded-full bg-sage-100 sm:h-[120px] sm:w-[120px]">
+    <div
+      className={
+        size
+          ? 'shrink-0 overflow-hidden rounded-full bg-sage-100'
+          : 'h-[104px] w-[104px] shrink-0 overflow-hidden rounded-full bg-sage-100 sm:h-[120px] sm:w-[120px]'
+      }
+      style={size ? { width: size, height: size } : undefined}
+    >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img

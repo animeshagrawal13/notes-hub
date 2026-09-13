@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { BookOpen, FolderTree, Leaf } from 'lucide-react';
-import OrganicBlob from '@/components/about/OrganicBlob';
+import AboutBackground from '@/components/about/AboutBackground';
 import StudyDoodle from '@/components/about/StudyDoodle';
 import Reveal from '@/components/about/Reveal';
 import MadeBy, { type Person } from '@/components/about/MadeBy';
@@ -33,12 +33,14 @@ const TEAM: Person[] = [
   {
     slug: 'viral-sharma',
     name: 'Viral Sharma',
+    subtitle: 'IT · 2nd Year',
     linkedin: 'https://www.linkedin.com/in/viral-sharma-2977b2349?utm_source=share_via&utm_content=profile&utm_medium=member_android',
     instagram: 'https://www.instagram.com/viral_.sharma?stkn=MXhmbGc2dHNvZXhhaw==',
   },
   {
     slug: 'animesh-agrawal',
     name: 'Animesh Agrawal',
+    subtitle: 'IT · 2nd Year',
     linkedin: 'https://www.linkedin.com/in/animeshagrawal13',
     instagram: 'https://www.instagram.com/_animesh_agrawal_',
   },
@@ -46,54 +48,49 @@ const TEAM: Person[] = [
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-4xl space-y-24 pb-10 sm:space-y-32">
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section className="relative">
-        <OrganicBlob tone="sage" className="-left-16 -top-24 h-72 w-72" />
-        <OrganicBlob tone="cream" className="right-0 top-10 h-56 w-56 sm:right-8" />
+    <div className="relative mx-auto max-w-4xl pb-6">
+      <AboutBackground />
 
-        <div className="relative z-10 grid items-center gap-10 sm:grid-cols-[1.15fr_0.85fr] sm:gap-8">
-          <Reveal>
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <Reveal>
+        <section className="grid items-center gap-8 sm:grid-cols-[1.2fr_0.8fr]">
+          <div>
             <p className="text-micro font-semibold uppercase tracking-[0.2em] text-text-faint">About</p>
-            <h1 className="mt-4 text-[clamp(2.4rem,5.4vw,3.6rem)] font-heading font-bold leading-[1.08] tracking-[-0.03em] text-ink">
+            <h1 className="mt-3 text-[clamp(2.3rem,5vw,3.4rem)] font-heading font-bold leading-[1.08] tracking-[-0.03em] text-ink">
               The right material,
               <br />
               <span className="text-sage-600 dark:text-sage-400">before the exam.</span>
             </h1>
-            <span aria-hidden className="mt-7 block h-[3px] w-20 rounded-full bg-sage-300" />
-            <p className="mt-6 max-w-xl text-body-lg leading-relaxed text-secondary">
+            <span aria-hidden className="mt-4 block h-[3px] w-16 rounded-full bg-sage-300" />
+            <p className="mt-4 max-w-2xl text-reader text-secondary">
               The single biggest problem students face before an exam is finding the correct, complete
               study material in time — it ends up scattered across a dozen chats and drives. SGSITS
               NotesVault exists to solve that one problem: the notes, class slides and previous year
               papers for every first-year subject, in one place, organised by subject and syllabus unit,
               open to everyone, with no account needed.
             </p>
-          </Reveal>
+          </div>
 
-          <Reveal delayMs={150} className="hidden sm:block">
-            <div className="relative mx-auto w-full max-w-[240px]">
-              <OrganicBlob tone="mint" className="-inset-6" />
-              <StudyDoodle variant="hero" className="relative z-10 w-full" />
-            </div>
-          </Reveal>
-        </div>
-      </section>
+          <div className="hidden sm:block">
+            <StudyDoodle variant="hero" className="mx-auto w-full max-w-[210px]" />
+          </div>
+        </section>
+      </Reveal>
 
       {/* ── What it gives you ────────────────────────────────────────────── */}
-      <Reveal>
-        <section aria-labelledby="reasons-heading" className="relative">
+      <Reveal delayMs={80}>
+        <section aria-labelledby="reasons-heading" className="mt-14 sm:mt-16">
           <h2 id="reasons-heading" className="sr-only">
             What SGSITS NotesVault gives you
           </h2>
-          <div className="relative z-10 grid gap-10 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-0 sm:divide-x sm:divide-border-soft">
+          <div className="grid gap-8 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-0 sm:divide-x sm:divide-border-soft">
             {REASONS.map(({ Icon, title, body }, i) => (
               <div key={title} className={i > 0 ? 'sm:pl-10' : ''}>
-                <span className="relative flex h-12 w-12 items-center justify-center">
-                  <OrganicBlob tone={i === 1 ? 'cream' : 'sage'} className="-inset-2 opacity-90" />
-                  <Icon size={21} strokeWidth={1.6} className="relative z-10 text-sage-700 dark:text-sage-300" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-sage-50 dark:bg-white/5">
+                  <Icon size={19} strokeWidth={1.6} className="text-sage-700 dark:text-sage-300" />
                 </span>
-                <h3 className="mt-5 text-body-lg font-semibold text-ink">{title}</h3>
-                <p className="mt-2 text-body leading-relaxed text-secondary">{body}</p>
+                <h3 className="mt-4 text-body-lg font-semibold text-ink">{title}</h3>
+                <p className="mt-1.5 text-body leading-relaxed text-secondary">{body}</p>
               </div>
             ))}
           </div>
@@ -101,34 +98,33 @@ export default function AboutPage() {
       </Reveal>
 
       {/* ── Founders ─────────────────────────────────────────────────────── */}
-      <Reveal>
-        <section aria-labelledby="team-heading" className="border-t border-border-soft pt-16">
+      <Reveal delayMs={80}>
+        <section aria-labelledby="team-heading" className="mt-14 border-t border-border-soft/70 pt-9 sm:mt-16">
           <MadeBy people={TEAM} />
         </section>
       </Reveal>
 
       {/* ── A note to the reader ─────────────────────────────────────────── */}
-      <Reveal>
-        <section aria-labelledby="note-heading" className="relative border-t border-border-soft pt-16">
-          <OrganicBlob tone="sage" className="-right-20 bottom-0 h-64 w-64" />
-          <div className="relative z-10 grid items-end gap-8 sm:grid-cols-[1.3fr_0.7fr]">
+      <Reveal delayMs={80}>
+        <section aria-labelledby="note-heading" className="mt-14 border-t border-border-soft/70 pt-9 sm:mt-16">
+          <div className="grid items-center gap-6 sm:grid-cols-[1.35fr_0.65fr]">
             <div>
               <h2
                 id="note-heading"
-                className="text-[clamp(1.5rem,3.4vw,2.1rem)] font-heading font-bold leading-tight tracking-[-0.02em] text-ink"
+                className="text-[clamp(1.4rem,3vw,1.9rem)] font-heading font-bold leading-tight tracking-[-0.02em] text-ink"
               >
                 A resource is only as good
                 <br className="hidden sm:block" /> as the class that keeps it alive.
               </h2>
-              <p className="mt-5 max-w-xl text-body-lg leading-relaxed text-secondary">
+              <p className="mt-3 max-w-2xl text-reader text-secondary">
                 Our one request: treat this as shared property, not a service. The few minutes it takes to
                 upload a clean set of notes or a corrected paper save the whole batch hours during exam
                 week. If a file is wrong, incomplete or in the wrong chapter, replace it — the library gets
                 a little better every time someone gives back to it.
               </p>
             </div>
-            <div className="relative hidden justify-self-end sm:block">
-              <StudyDoodle variant="closing" className="w-44" />
+            <div className="hidden justify-self-end sm:block">
+              <StudyDoodle variant="closing" className="w-36" />
             </div>
           </div>
         </section>

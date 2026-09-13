@@ -13,23 +13,28 @@ export function StudyDoodle({
 }) {
   if (variant === 'closing') {
     return (
-      <svg
-        viewBox="0 0 220 170"
-        fill="none"
-        className={className}
-        aria-hidden
-      >
-        <g stroke="var(--sage-500)" strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round">
-          <rect x="38" y="108" width="144" height="28" rx="6" fill="var(--sage-100)" />
-          <rect x="50" y="80" width="120" height="28" rx="6" fill="var(--surface-elevated)" />
-          <rect x="62" y="52" width="96" height="28" rx="6" fill="var(--sage-100)" />
-          <path d="M62 66h96" strokeDasharray="2 5" opacity="0.6" />
-          <path d="M50 94h120" strokeDasharray="2 5" opacity="0.6" />
-          <path d="M38 122h144" strokeDasharray="2 5" opacity="0.6" />
+      <svg viewBox="0 0 200 150" fill="none" className={className} aria-hidden>
+        {/* two books, slightly fanned */}
+        <g stroke="var(--sage-500)" strokeWidth="1.5" strokeLinejoin="round">
+          <rect x="34" y="86" width="108" height="20" rx="4" fill="var(--sage-100)" transform="rotate(-2 88 96)" />
+          <rect x="40" y="66" width="98" height="20" rx="4" fill="var(--surface-elevated)" transform="rotate(1.5 89 76)" />
         </g>
-        <g className="animate-doodle-float" style={{ transformOrigin: '178px 40px' }}>
-          <circle cx="178" cy="40" r="14" fill="var(--accent-cream)" opacity="0.9" />
-          <path d="M172 40l4 4 8-9" stroke="var(--sage-700)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        {/* pencil leaning against the stack */}
+        <g transform="rotate(58 150 60)">
+          <rect x="146" y="18" width="7" height="64" rx="3.5" fill="var(--sage-600)" />
+          <path d="M146 18l3.5-12 3.5 12z" fill="var(--sage-700)" />
+          <rect x="146" y="72" width="7" height="8" fill="var(--accent-cream)" />
+        </g>
+        {/* a small sprig beside the books — the site's one "growth" note */}
+        <g className="animate-doodle-float" style={{ transformOrigin: '30px 82px', animationDelay: '0.6s' }}>
+          <path
+            d="M30 84c0-14 3-24 3-24s7 8 5 20-8 4-8 4z"
+            fill="var(--sage-300)"
+            stroke="var(--sage-600)"
+            strokeWidth="1.2"
+            strokeLinejoin="round"
+          />
+          <path d="M31 84c1-9 2-16 2-16" stroke="var(--sage-600)" strokeWidth="1.1" strokeLinecap="round" />
         </g>
       </svg>
     );
